@@ -1,0 +1,10 @@
+{
+  "name": "마음 케어",
+  "short_name": "마음 케어",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF8F2",
+  "theme_color": "#163D32",
+  "lang": "ko",
+  "icons": []
+}

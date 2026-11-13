@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /$
+Disallow: /c
+Disallow: /t
+Disallow: /e
+Disallow: /admin
