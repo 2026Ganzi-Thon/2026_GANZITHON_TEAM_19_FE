@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-fg);
+    background-color: var(--color-bg);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    /* TRD 18-4: 100vh 대신 100dvh */
+    min-height: 100dvh;
+  }
+
+  #root {
+    min-height: 100dvh;
+    /* 마스코트의 mix-blend-mode 가 섞일 배경을 루트 캔버스가 아닌 요소에 둔다 */
+    background-color: var(--color-bg);
+  }
+
+  /* TRD 18-3: 포커스 링을 숨기지 않는다 */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-green);
+    outline-offset: 2px;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
