@@ -58,5 +58,10 @@ export const COMMON = {
 } as const;
 
 export const NAV = {
-  client: { home: '홈', sessions: '상담', notifications: '알림', settings: '내 정보' },
+  home: '홈',
+  notifications: '알림',
+  settings: '내 정보',
+  client: { sessions: '상담' },
+  trainee: { sessions: '코칭', supervisions: '피드백' },
+  expert: { referrals: '연계', supervisions: '슈퍼비전' },
 } as const;

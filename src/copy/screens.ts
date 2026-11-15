@@ -9,6 +9,17 @@ export const LANDING = {
   joinAsProvider: '상담사로 함께하기',
 } as const;
 
+/** 넓은 화면에서 앱 화면 옆에 보이는 서비스 소개 */
+export const SHELL = {
+  headline: '어떤 이야기도\n괜찮아요.',
+  description:
+    '익명으로 부담 없이 시작하는 마음 상담.\n휴대폰에서도 같은 화면으로 이어서 쓸 수 있어요.',
+  /** 움직이는 고양이 버튼의 이름. 눌린 상태(aria-pressed)가 잠든 상태다 */
+  petSleep: '고양이 재우기',
+  petSleepHint: '누르면 고양이가 잠들어요',
+  petWakeHint: '누르면 고양이가 일어나요',
+} as const;
+
 export const LOGIN = {
   titleLogin: '다시 만나 반가워요',
   titleSignup: '익명으로 부담 없이 시작해요',
