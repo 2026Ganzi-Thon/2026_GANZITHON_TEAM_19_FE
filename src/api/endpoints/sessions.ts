@@ -1,8 +1,22 @@
-import { api } from '@/api/client';
+import { api, idempotencyHeader } from '@/api/client';
+import type { PendingSessionFields, SessionCreateRequest } from '@/api/pending';
+import type { ProviderSessionFields } from '@/api/pendingProvider';
 import type { Schema } from '@/api/types';
 
-export type Session = Schema<'SessionResponse'>;
+// report·can_rebook 은 아직 배포 전이라 지금 서버 응답에는 없다 (api/pending.ts)
+export type Session = Schema<'SessionResponse'> & PendingSessionFields & ProviderSessionFields;
 export type SessionStatus = NonNullable<Session['status']>;
+
+/** SES-01. 10분 홀드된 결제 대기 세션을 만든다. 같은 선택의 재시도에는 같은 멱등 키를 쓴다 */
+export async function createSession(
+  body: SessionCreateRequest,
+  idempotencyKey: string,
+): Promise<Session> {
+  const { data } = await api.post<Session>('/sessions', body, {
+    headers: idempotencyHeader(idempotencyKey),
+  });
+  return data;
+}
 
 /** SES-02 */
 export async function listSessions(): Promise<Session[]> {

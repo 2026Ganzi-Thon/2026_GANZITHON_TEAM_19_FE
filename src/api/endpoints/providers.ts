@@ -18,3 +18,11 @@ export async function listOpenSlots(
   const { data } = await api.get<OpenSlot[]>(`/providers/${providerId}/slots`, { params });
   return data;
 }
+
+/** USR-06. 프로필을 저장한다 */
+export async function saveProviderProfile(
+  body: Schema<'ProviderProfileRequest'>,
+): Promise<Schema<'ProviderProfileResponse'>> {
+  const { data } = await api.put<Schema<'ProviderProfileResponse'>>('/me/provider-profile', body);
+  return data;
+}
