@@ -2,6 +2,41 @@
 @import './tokens.css';
 @import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 
+/* 왼쪽 소개의 고양이 (MascotPet). 숨 쉬는 정도로만 작게 움직인다 */
+@theme {
+  --animate-pet-breathe: pet-breathe 3.8s ease-in-out infinite;
+  /* 시간은 MascotPet 의 PET_HOP_MS 와 같다 */
+  --animate-pet-hop: pet-hop 520ms ease-out 1;
+
+  @keyframes pet-breathe {
+    0%,
+    100% {
+      transform: scaleY(1);
+    }
+    50% {
+      transform: scaleY(1.03);
+    }
+  }
+
+  @keyframes pet-hop {
+    0% {
+      transform: translateY(0) scale(1, 1);
+    }
+    18% {
+      transform: translateY(0) scale(1.04, 0.95);
+    }
+    52% {
+      transform: translateY(-7px) scale(0.98, 1.03);
+    }
+    82% {
+      transform: translateY(0) scale(1.03, 0.97);
+    }
+    100% {
+      transform: translateY(0) scale(1, 1);
+    }
+  }
+}
+
 @layer base {
   html {
     font-family: var(--font-sans);
@@ -51,4 +86,46 @@
 
 @utility safe-top {
   padding-top: env(safe-area-inset-top);
+}
+
+/* 마음 온도 슬라이더 (MoodSlider). 터치 영역은 44px, 보이는 막대는 가늘게 둔다 */
+@utility mood-range {
+  appearance: none;
+  width: 100%;
+  height: var(--size-touch);
+  background: transparent;
+  cursor: pointer;
+
+  &::-webkit-slider-runnable-track {
+    height: calc(var(--spacing) * 0.5);
+    background-color: var(--color-line);
+  }
+
+  &::-moz-range-track {
+    height: calc(var(--spacing) * 0.5);
+    background-color: var(--color-line);
+  }
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    margin-top: calc(var(--spacing) * -1.75);
+    border: 0;
+    border-radius: var(--radius-full);
+    background: url('../assets/icons/slider-thumb.svg') center / contain no-repeat;
+  }
+
+  &::-moz-range-thumb {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    border: 0;
+    border-radius: var(--radius-full);
+    background: url('../assets/icons/slider-thumb.svg') center / contain no-repeat;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
