@@ -1,13 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Link } from 'react-router';
 
-import { getProvider } from '@/api/endpoints/providers';
-import { listSessions, type Session } from '@/api/endpoints/sessions';
+import type { Session } from '@/api/endpoints/sessions';
 import { isApiError } from '@/api/errors';
-import { queryKeys } from '@/api/queryKeys';
 import { Screen } from '@/app/layouts/Screen';
 import { CrisisButton } from '@/components/crisis/CrisisButton';
+import { ButtonLink } from '@/components/ui/ButtonLink';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ListRow } from '@/components/ui/ListRow';
@@ -15,34 +13,21 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { EMPTY } from '@/copy/empty';
 import { errorCopy } from '@/copy/errorMessages';
 import { COMMON, NOTICE } from '@/copy/fixed';
+import { REPORT } from '@/copy/referral';
 import { CLIENT_HOME } from '@/copy/screens';
 import { useNow } from '@/hooks/useNow';
 import { track } from '@/lib/analytics';
-import { cx } from '@/lib/cx';
 import { formatKST } from '@/lib/date';
 import { useAuthStore } from '@/stores/authStore';
 
+import { useProviderName, useSessions } from './queries';
 import { canEnter, isCoaching, pickRecent, pickUpcoming, trackLabel } from './sessions';
 
-const SESSIONS_STALE_MS = 30_000;
-const PROVIDER_STALE_MS = 5 * 60_000;
-
-const PRIMARY_LINK =
-  'flex min-h-(--size-button) items-center justify-center rounded-sm bg-action px-4 text-body font-bold text-fg-inverse';
-
-function useProviderName(providerId: string | undefined): string {
-  const { data } = useQuery({
-    queryKey: queryKeys.provider(providerId ?? ''),
-    queryFn: () => getProvider(providerId ?? ''),
-    enabled: Boolean(providerId),
-    staleTime: PROVIDER_STALE_MS,
-  });
-  return data?.display_name ?? '';
-}
+const RECENT_LINK =
+  'flex min-h-(--size-touch) items-center text-caption font-bold text-fg underline';
 
 function UpcomingSession({ session, now }: { session: Session; now: number }) {
   const providerName = useProviderName(session.provider_id);
-  const enterable = canEnter(session, now);
 
   return (
     <section aria-labelledby="upcoming-title" className="border-b border-line pb-8 pt-6">
@@ -58,18 +43,13 @@ function UpcomingSession({ session, now }: { session: Session; now: number }) {
         {[providerName, trackLabel(session)].filter(Boolean).join('  /  ')}
       </p>
       <p className="pt-2 text-caption text-fg-muted">{CLIENT_HOME.enterHint}</p>
-      {enterable ? (
-        <Link to={`/c/sessions/${session.session_id}/lobby`} className={cx(PRIMARY_LINK, 'mt-4')}>
-          {CLIENT_HOME.enterLobby}
-        </Link>
-      ) : (
-        <span
-          aria-disabled="true"
-          className={cx(PRIMARY_LINK, 'mt-4 cursor-not-allowed bg-action-disabled')}
-        >
-          {CLIENT_HOME.enterLobby}
-        </span>
-      )}
+      <ButtonLink
+        to={`/c/sessions/${session.session_id}/lobby`}
+        disabled={!canEnter(session, now)}
+        className="mt-4"
+      >
+        {CLIENT_HOME.enterLobby}
+      </ButtonLink>
     </section>
   );
 }
@@ -86,15 +66,22 @@ function RecentSession({ session }: { session: Session }) {
         </span>
         <span className="text-caption text-fg-muted">{when}</span>
       </span>
-      {isCoaching(session) && session.provider_id && (
-        <Link
-          to={`/c/providers/${session.provider_id}?rebook_of=${session.session_id}`}
-          onClick={() => track('rebook_started')}
-          className="flex min-h-(--size-touch) shrink-0 items-center text-caption font-bold text-fg underline"
-        >
-          {CLIENT_HOME.rebook}
-        </Link>
-      )}
+      <span className="flex shrink-0 flex-col items-end">
+        {session.report && (
+          <Link to={`/c/reports/${session.report.id}`} className={RECENT_LINK}>
+            {REPORT.view}
+          </Link>
+        )}
+        {isCoaching(session) && session.provider_id && (
+          <Link
+            to={`/c/providers/${session.provider_id}?rebook_of=${session.session_id}`}
+            onClick={() => track('rebook_started')}
+            className={RECENT_LINK}
+          >
+            {CLIENT_HOME.rebook}
+          </Link>
+        )}
+      </span>
     </li>
   );
 }
@@ -103,11 +90,7 @@ function RecentSession({ session }: { session: Session }) {
 export function C01HomePage() {
   const nickname = useAuthStore((state) => state.me?.nickname ?? '');
   const now = useNow();
-  const { data, isPending, isError, error, refetch } = useQuery({
-    queryKey: queryKeys.sessions('client', 'all'),
-    queryFn: listSessions,
-    staleTime: SESSIONS_STALE_MS,
-  });
+  const { data, isPending, isError, error, refetch } = useSessions();
 
   useEffect(() => {
     track('home_viewed');
@@ -142,11 +125,7 @@ export function C01HomePage() {
         <EmptyState
           title={EMPTY.clientHome.title}
           description={EMPTY.clientHome.description}
-          action={
-            <Link to="/c/intake" className={PRIMARY_LINK}>
-              {EMPTY.clientHome.action}
-            </Link>
-          }
+          action={<ButtonLink to="/c/intake">{EMPTY.clientHome.action}</ButtonLink>}
         />
       ) : (
         data && <ListRow to="/c/intake" title={CLIENT_HOME.newIntake} emphasis />

@@ -3,24 +3,38 @@ import { SERVICE } from '@/copy/fixed';
 
 /** 입장 버튼이 열리는 시점: 시작 10분 전 (TRD C-01, C-08) */
 export const ENTER_BEFORE_MINUTES = 10;
+/** 이 시간 전에 취소해야 전액 환불된다 (TRD C-06, 운영 설정값) */
+export const REFUND_BEFORE_HOURS = 24;
 const RECENT_COUNT = 3;
+const MINUTE_MS = 60_000;
+const HOUR_MS = 60 * MINUTE_MS;
 
-const UPCOMING_STATUSES: ReadonlyArray<Session['status']> = ['CONFIRMED', 'IN_PROGRESS'];
+const ACTIVE_STATUSES: ReadonlyArray<Session['status']> = ['CONFIRMED', 'IN_PROGRESS'];
+const UPCOMING_STATUSES: ReadonlyArray<Session['status']> = [
+  'PENDING_PAYMENT',
+  'CONFIRMED',
+  'IN_PROGRESS',
+];
+const PROFESSIONAL_TRACKS: ReadonlyArray<string | undefined> = ['professional', 'expert'];
 
 function startTime(session: Session): number {
   return session.scheduled_start ? Date.parse(session.scheduled_start) : 0;
 }
 
-/** 가장 가까운 예정 상담 */
-export function pickUpcoming(sessions: readonly Session[], now: number): Session | null {
-  const upcoming = sessions
+/** 예정 상담을 가까운 순으로 */
+export function pickUpcomingList(sessions: readonly Session[], now: number): Session[] {
+  return sessions
     .filter(
       (session) =>
-        UPCOMING_STATUSES.includes(session.status) &&
+        ACTIVE_STATUSES.includes(session.status) &&
         (session.scheduled_end ? Date.parse(session.scheduled_end) > now : true),
     )
     .sort((a, b) => startTime(a) - startTime(b));
-  return upcoming[0] ?? null;
+}
+
+/** 가장 가까운 예정 상담 */
+export function pickUpcoming(sessions: readonly Session[], now: number): Session | null {
+  return pickUpcomingList(sessions, now)[0] ?? null;
 }
 
 /** 최근 끝난 상담 3건 */
@@ -31,15 +45,62 @@ export function pickRecent(sessions: readonly Session[]): Session[] {
     .slice(0, RECENT_COUNT);
 }
 
+/** C-07 탭: 예정(결제 대기·확정·진행 중)은 가까운 순, 지난 상담은 최근 순 */
+export function splitSessions(sessions: readonly Session[]): {
+  upcoming: Session[];
+  past: Session[];
+} {
+  const isUpcoming = (session: Session) => UPCOMING_STATUSES.includes(session.status);
+  return {
+    upcoming: sessions.filter(isUpcoming).sort((a, b) => startTime(a) - startTime(b)),
+    past: sessions
+      .filter((session) => !isUpcoming(session))
+      .sort((a, b) => startTime(b) - startTime(a)),
+  };
+}
+
 export function canEnter(session: Session, now: number): boolean {
   if (session.status === 'IN_PROGRESS') return true;
-  return startTime(session) - now <= ENTER_BEFORE_MINUTES * 60_000;
+  if (session.status !== 'CONFIRMED') return false;
+  return startTime(session) - now <= ENTER_BEFORE_MINUTES * MINUTE_MS;
+}
+
+/** 지금 취소하면 전액 환불되는지 (시작 24시간 전까지) */
+export function isRefundable(session: Session, now: number): boolean {
+  return startTime(session) - now >= REFUND_BEFORE_HOURS * HOUR_MS;
+}
+
+export function sessionMinutes(session: Session): number | null {
+  if (!session.scheduled_start || !session.scheduled_end) return null;
+  const minutes = Math.round(
+    (Date.parse(session.scheduled_end) - Date.parse(session.scheduled_start)) / MINUTE_MS,
+  );
+  return minutes > 0 ? minutes : null;
+}
+
+/** 매칭·세션은 coaching/professional, 상담사 프로필은 trainee/expert 로 트랙을 적는다 */
+export function isProfessionalTrack(track: string | undefined): boolean {
+  return PROFESSIONAL_TRACKS.includes(track);
+}
+
+/** 화면에 보일 서비스 이름. 수련생 서비스는 "마음 코칭" 이라고만 부른다 (TRD 14장) */
+export function serviceLabel(track: string | undefined): string {
+  return isProfessionalTrack(track) ? SERVICE.professional : SERVICE.coaching;
 }
 
 export function isCoaching(session: Session): boolean {
-  return session.track !== 'professional';
+  return !isProfessionalTrack(session.track);
 }
 
 export function trackLabel(session: Session): string {
-  return isCoaching(session) ? SERVICE.coaching : SERVICE.professional;
+  return serviceLabel(session.track);
+}
+
+/** 민원은 상담이 끝나고 이 기간 안에만 낼 수 있다 (TRD C-13) */
+export const COMPLAINT_WINDOW_DAYS = 7;
+
+export function isComplaintOpen(session: Session, now: number): boolean {
+  if (session.status !== 'COMPLETED' && session.status !== 'NO_SHOW') return false;
+  const endedAt = session.scheduled_end ? Date.parse(session.scheduled_end) : startTime(session);
+  return now - endedAt <= COMPLAINT_WINDOW_DAYS * 24 * HOUR_MS;
 }
