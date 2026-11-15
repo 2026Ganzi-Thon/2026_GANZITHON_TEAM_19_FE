@@ -3,16 +3,38 @@ import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SHELL } from '@/copy/screens';
+import { useCrisisStore } from '@/stores/crisisStore';
 
-import { MascotPet, PET_HOP_MS, PET_STORAGE_KEY } from './MascotPet';
-import { gapMs, PET_ACTIONS, PET_FIRST_GAP_MS, pickAction, type PetStep } from './petBehavior';
+import { MascotPet, PET_STORAGE_KEY } from './MascotPet';
+import {
+  gapMs,
+  PET_ACTIONS,
+  PET_FIRST_GAP_MS,
+  PET_HOP_MS,
+  PET_MAX_SLOT,
+  PET_STEP_PX,
+  pickAction,
+  type PetAction,
+  type PetStep,
+} from './petBehavior';
 import { PET_FRAMES } from './petFrames';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 const DESKTOP = '(min-width: 1024px)';
 const lowestRoll = () => 0;
+/** 제자리(집)에 있고 붙잡히지 않은 상태 */
+const HOME = { slot: 0, canRoam: true };
 /** lowestRoll 일 때 나오는 첫 동작 */
-const FIRST_STEPS = PET_ACTIONS[pickAction(0)].steps;
+const FIRST_STEPS = PET_ACTIONS[pickAction(0, HOME)].steps;
+
+/** 그 상황(기본은 집)에서 그 동작이 뽑히는 난수 */
+function rollFor(action: PetAction, situation = HOME): number {
+  const roll = Array.from({ length: 1000 }, (_, index) => index / 1000).find(
+    (candidate) => pickAction(candidate, situation) === action,
+  );
+  if (roll === undefined) throw new Error(`no roll picks ${action}`);
+  return roll;
+}
 
 let mediaMatches: Record<string, boolean> = {};
 const mediaListeners = new Map<string, Set<() => void>>();
@@ -75,6 +97,15 @@ function advance(ms: number): void {
   });
 }
 
+/** 한 칸 갔다가 돌아오기도 하므로, 주어진 시간 안에 한 번이라도 자리를 옮기는지 본다 */
+function roamsWithin(ms: number): boolean {
+  for (let elapsed = 0; elapsed < ms; elapsed += 100) {
+    advance(100);
+    if (petButton().style.left !== '0px') return true;
+  }
+  return false;
+}
+
 function totalMs(steps: readonly PetStep[]): number {
   return steps.reduce((sum, step) => sum + step.ms, 0);
 }
@@ -88,6 +119,7 @@ describe('MascotPet', () => {
   });
 
   afterEach(() => {
+    act(() => useCrisisStore.setState({ open: false }));
     setPageVisibility('visible');
     vi.useRealTimers();
     vi.unstubAllGlobals();
@@ -208,7 +240,7 @@ describe('MascotPet', () => {
 
   it('falls asleep at once when pressed in the middle of a move', () => {
     const roll = 0.5;
-    const glance = PET_ACTIONS[pickAction(roll)].steps;
+    const glance = PET_ACTIONS[pickAction(roll, HOME)].steps;
     render(<MascotPet random={() => roll} />);
     advance(PET_FIRST_GAP_MS);
     expect(stage().dataset.frame).toBe(glance[0]?.frame);
@@ -298,6 +330,174 @@ describe('MascotPet', () => {
     fireEvent.pointerEnter(petButton());
 
     expect(stage().className).not.toContain('animate-pet-hop');
+  });
+
+  it('plays a whole-body motion during a move that has one, then breathes again', () => {
+    const roll = rollFor('tilt');
+    render(<MascotPet random={() => roll} />);
+
+    advance(PET_FIRST_GAP_MS);
+    expect(stage().className).toContain('animate-pet-tilt');
+
+    advance(totalMs(PET_ACTIONS.tilt.steps));
+    expect(stage().className).toContain('animate-pet-breathe');
+  });
+
+  it('hops one spot to the side and takes the whole button with it', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    expect(petButton().style.left).toBe('0px');
+
+    advance(PET_FIRST_GAP_MS + totalMs(PET_ACTIONS.hopRight.steps));
+
+    expect(petButton().style.left).toBe(`${PET_STEP_PX}px`);
+    expect(stage().dataset.frame).toBe('front');
+  });
+
+  it('does not carry the cat away once the pointer is on it, even in the middle of a sideways hop', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    advance(PET_FIRST_GAP_MS);
+
+    fireEvent.pointerEnter(petButton());
+    advance(totalMs(PET_ACTIONS.hopRight.steps) + 30_000);
+
+    expect(petButton().style.left).toBe('0px');
+  });
+
+  it('roams again after the pointer leaves', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    fireEvent.pointerEnter(petButton());
+    advance(10_000);
+    expect(petButton().style.left).toBe('0px');
+
+    fireEvent.pointerLeave(petButton());
+
+    expect(roamsWithin(15_000)).toBe(true);
+  });
+
+  it('stops right where it is when the pointer arrives during a sideways hop', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    advance(PET_FIRST_GAP_MS + (PET_ACTIONS.hopRight.steps[0]?.ms ?? 0));
+    expect(petButton().style.left).toBe(`${PET_STEP_PX}px`);
+
+    // 미끄러지는 도중이라 실제 위치는 아직 목표에 못 미친 20px 이다.
+    // 버튼을 먼저 찾아 둔다. 역할로 찾는 과정도 getComputedStyle 을 쓴다
+    const button = petButton();
+    const midSlide = vi
+      .spyOn(window, 'getComputedStyle')
+      .mockReturnValue({ left: '20px' } as CSSStyleDeclaration);
+    fireEvent.pointerEnter(button);
+    midSlide.mockRestore();
+    expect(petButton().style.left).toBe('20px');
+
+    fireEvent.pointerLeave(petButton());
+    expect(petButton().style.left).toBe(`${PET_STEP_PX}px`);
+  });
+
+  it('roams again after it loses keyboard focus', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    fireEvent.focus(petButton());
+    advance(10_000);
+    expect(petButton().style.left).toBe('0px');
+
+    fireEvent.blur(petButton());
+
+    expect(roamsWithin(15_000)).toBe(true);
+  });
+
+  it('does not treat a mouse click as keyboard focus, so it roams again after being woken by a click', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+
+    fireEvent.pointerDown(petButton());
+    fireEvent.focus(petButton());
+    fireEvent.pointerUp(petButton());
+    fireEvent.click(petButton());
+    fireEvent.click(petButton());
+
+    expect(roamsWithin(15_000)).toBe(true);
+  });
+
+  it('never goes past its farthest spot, and hops back toward home', () => {
+    const rolls = [
+      rollFor('hopRight'),
+      0,
+      rollFor('hopRight', { slot: 1, canRoam: true }),
+      0,
+      rollFor('hopLeft', { slot: PET_MAX_SLOT, canRoam: true }),
+    ];
+    const calls = { count: 0 };
+    const scripted = () => rolls[Math.min(calls.count++, rolls.length - 1)] ?? 0;
+    const hop = totalMs(PET_ACTIONS.hopRight.steps);
+    render(<MascotPet random={scripted} />);
+
+    advance(PET_FIRST_GAP_MS + hop + gapMs(0) + hop);
+    expect(petButton().style.left).toBe(`${PET_MAX_SLOT * PET_STEP_PX}px`);
+
+    advance(gapMs(0) + totalMs(PET_ACTIONS.hopLeft.steps));
+    expect(petButton().style.left).toBe(`${(PET_MAX_SLOT - 1) * PET_STEP_PX}px`);
+  });
+
+  it('stays on its spot while it has keyboard focus, so the focus ring stays on the cat', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+
+    fireEvent.focus(petButton());
+    advance(30_000);
+
+    expect(petButton().style.left).toBe('0px');
+  });
+
+  it('falls asleep where it is, so the next press still lands on it', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    advance(PET_FIRST_GAP_MS + totalMs(PET_ACTIONS.hopRight.steps));
+    expect(petButton().style.left).toBe(`${PET_STEP_PX}px`);
+
+    fireEvent.click(petButton());
+
+    expect(petButton().style.left).toBe(`${PET_STEP_PX}px`);
+    expect(stage().dataset.frame).toBe('sleep');
+  });
+
+  it('stays where it is when the crisis notice opens', () => {
+    const roll = rollFor('hopRight');
+    render(<MascotPet random={() => roll} />);
+    advance(PET_FIRST_GAP_MS + totalMs(PET_ACTIONS.hopRight.steps));
+
+    act(() => useCrisisStore.setState({ open: true }));
+
+    expect(petButton().style.left).toBe(`${PET_STEP_PX}px`);
+    expect(stage().dataset.frame).toBe('front');
+  });
+
+  it('does not cut a whole-body motion short with a greeting hop', () => {
+    const roll = rollFor('tilt');
+    render(<MascotPet random={() => roll} />);
+    advance(PET_FIRST_GAP_MS);
+
+    fireEvent.pointerEnter(petButton());
+
+    expect(stage().className).toContain('animate-pet-tilt');
+    expect(stage().className).not.toContain('animate-pet-hop');
+  });
+
+  it('keeps still while the crisis notice is open, and moves again after it closes', () => {
+    render(<MascotPet random={lowestRoll} />);
+
+    act(() => useCrisisStore.setState({ open: true }));
+    advance(60_000);
+    expect(stage().dataset.frame).toBe('front');
+    expect(stage().className).not.toMatch(/animate-/);
+    expect(vi.getTimerCount()).toBe(0);
+
+    act(() => useCrisisStore.setState({ open: false }));
+    advance(PET_FIRST_GAP_MS);
+    expect(stage().dataset.frame).toBe(FIRST_STEPS[0]?.frame);
   });
 
   it('leaves no timers behind after it unmounts', () => {

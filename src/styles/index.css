@@ -2,11 +2,14 @@
 @import './tokens.css';
 @import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 
-/* 왼쪽 소개의 고양이 (MascotPet). 숨 쉬는 정도로만 작게 움직인다 */
+/* 왼쪽 소개의 고양이 (MascotPet). 가만히 있을 때는 숨만 쉬고, 동작마다 몸 전체 움직임을 한 번씩 한다.
+   각 시간은 components/mascot/petBehavior.ts 의 단계 시간(PET_HOP_MS 등)과 같게 둔다 */
 @theme {
   --animate-pet-breathe: pet-breathe 3.8s ease-in-out infinite;
-  /* 시간은 MascotPet 의 PET_HOP_MS 와 같다 */
   --animate-pet-hop: pet-hop 520ms ease-out 1;
+  --animate-pet-tilt: pet-tilt 1100ms ease-in-out 1;
+  --animate-pet-wiggle: pet-wiggle 900ms ease-in-out 1;
+  --animate-pet-stretch: pet-stretch 1300ms ease-in-out 1;
 
   @keyframes pet-breathe {
     0%,
@@ -18,21 +21,66 @@
     }
   }
 
+  /* 폴짝: 움츠렸다가 뛰고, 내려앉으며 살짝 눌린다 */
   @keyframes pet-hop {
     0% {
       transform: translateY(0) scale(1, 1);
     }
     18% {
-      transform: translateY(0) scale(1.04, 0.95);
+      transform: translateY(0) scale(1.05, 0.93);
     }
     52% {
-      transform: translateY(-7px) scale(0.98, 1.03);
+      transform: translateY(-11px) scale(0.97, 1.04);
     }
     82% {
-      transform: translateY(0) scale(1.03, 0.97);
+      transform: translateY(0) scale(1.04, 0.95);
     }
     100% {
       transform: translateY(0) scale(1, 1);
+    }
+  }
+
+  /* 갸웃: 한쪽으로 기울였다가 잠깐 머문다 */
+  @keyframes pet-tilt {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    30%,
+    70% {
+      transform: rotate(-9deg);
+    }
+  }
+
+  /* 씰룩: 좌우로 짧게 흔든다 */
+  @keyframes pet-wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    20% {
+      transform: rotate(-5deg);
+    }
+    40% {
+      transform: rotate(5deg);
+    }
+    60% {
+      transform: rotate(-4deg);
+    }
+    80% {
+      transform: rotate(3deg);
+    }
+  }
+
+  /* 기지개: 위로 길게 늘였다가 돌아온다 */
+  @keyframes pet-stretch {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    35%,
+    70% {
+      transform: scale(0.95, 1.1);
     }
   }
 }
