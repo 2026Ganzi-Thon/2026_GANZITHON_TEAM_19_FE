@@ -1,25 +1,18 @@
 import { http, HttpResponse } from 'msw';
 
 import type { Schema } from '@/api/types';
-import { env } from '@/lib/env';
 
-import { uidFromAuthorization } from './auth';
+import { accountHandlers } from './accountHandlers';
+import { appConfig } from './adminDb';
+import { adminHandlers } from './adminHandlers';
+import { clientHandlers } from './clientHandlers';
 import { mockDb } from './db';
+import { currentUid, errorResponse, notFound, unauthenticated, url } from './http';
+import { providerHandlers } from './providerHandlers';
+import { reportHandlers } from './reportHandlers';
+import { workHandlers } from './workHandlers';
 
 // 목 응답도 schema.d.ts 타입으로 써서 계약이 어긋나면 타입 오류가 나게 한다 (TRD 7-5, 10-2)
-const url = (path: string) => `${env.apiBaseUrl}${path}`;
-
-function errorResponse(status: number, code: string, message: string) {
-  return HttpResponse.json(
-    { error: { code, message, details: {}, request_id: `req_mock_${crypto.randomUUID()}` } },
-    { status },
-  );
-}
-
-function currentUid(request: Request): string | null {
-  return uidFromAuthorization(request.headers.get('Authorization'));
-}
-
 const terms: Schema<'TermsResponse'>[] = [
   {
     type: 'terms',
@@ -65,17 +58,6 @@ const terms: Schema<'TermsResponse'>[] = [
   },
 ];
 
-const appConfig: Schema<'AppConfigResponse'> = {
-  feature_flags: {
-    p1_certificates: false,
-    p1_supervision_requests: false,
-    p1_complaints: false,
-    p1_credential_auto_verify: false,
-  },
-  maintenance: { on: false },
-  min_client_version: '2026.10.26',
-};
-
 const crisisContacts: Schema<'CrisisContact'>[] = [
   { name: '자살예방상담', number: '109', description: '24시간 자살 위기 상담' },
   { name: '정신건강위기상담', number: '1577-0199', description: '24시간 정신건강 위기 상담' },
@@ -90,7 +72,7 @@ export const handlers = [
 
   http.get(url('/me'), ({ request }) => {
     const uid = currentUid(request);
-    if (!uid) return errorResponse(401, 'UNAUTHENTICATED', '로그인이 필요합니다');
+    if (!uid) return unauthenticated();
     const me = mockDb.users.get(uid);
     if (!me) return errorResponse(404, 'USER_NOT_REGISTERED', '가입을 먼저 완료해 주세요');
     return HttpResponse.json(me);
@@ -98,7 +80,7 @@ export const handlers = [
 
   http.post(url('/auth/register'), async ({ request }) => {
     const uid = currentUid(request);
-    if (!uid) return errorResponse(401, 'UNAUTHENTICATED', '로그인이 필요합니다');
+    if (!uid) return unauthenticated();
     if (mockDb.users.has(uid))
       return errorResponse(409, 'ALREADY_REGISTERED', '이미 가입된 계정입니다');
     const body = (await request.json()) as Schema<'RegisterRequest'>;
@@ -114,26 +96,17 @@ export const handlers = [
     return HttpResponse.json(me, { status: 201 });
   }),
 
-  http.get(url('/sessions'), ({ request }) => {
-    const me = mockDb.users.get(currentUid(request) ?? '');
-    if (!me) return errorResponse(401, 'UNAUTHENTICATED', '로그인이 필요합니다');
-    const mine = mockDb.sessions.filter(
-      (session) => session.client_id === me.id || session.provider_id === me.id,
-    );
-    return HttpResponse.json(mine);
-  }),
-
   http.get(url('/providers/:providerId'), ({ params }) => {
     const provider = mockDb.providers.find((item) => item.provider_id === params.providerId);
-    return provider
-      ? HttpResponse.json(provider)
-      : errorResponse(404, 'NOT_FOUND', '찾을 수 없습니다');
-  }),
-
-  http.get(url('/notifications'), () => {
-    const page: Schema<'NotificationPageResponse'> = { items: [], unread_count: 0 };
-    return HttpResponse.json(page);
+    return provider ? HttpResponse.json(provider) : notFound();
   }),
 
   http.post(url('/events'), () => new HttpResponse(null, { status: 204 })),
+
+  ...accountHandlers,
+  ...adminHandlers,
+  ...clientHandlers,
+  ...providerHandlers,
+  ...reportHandlers,
+  ...workHandlers,
 ];
