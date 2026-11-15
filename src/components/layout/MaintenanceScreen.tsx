@@ -9,7 +9,7 @@ interface MaintenanceScreenProps {
 /** 점검 모드 전체 화면. 위기 연락처는 내장 기본값으로 항상 보인다 (TRD 17-8, 18-1). */
 export function MaintenanceScreen({ message, until }: MaintenanceScreenProps) {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-(--size-content) flex-col justify-center gap-4 px-6 py-10">
+    <main className="mx-auto flex w-full max-w-(--size-content) grow flex-col justify-center gap-4 px-6 py-10">
       <h1 className="text-title font-bold text-fg">{message || COMMON.maintenanceTitle}</h1>
       {until && (
         <p className="text-body text-fg-muted">{COMMON.maintenanceUntil(formatKST(until))}</p>
