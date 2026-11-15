@@ -5,6 +5,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import { onApiError } from '@/api/client';
 import { queryKeys } from '@/api/queryKeys';
 import { CrisisModal } from '@/components/crisis/CrisisModal';
+import { AppFrame } from '@/components/layout/AppFrame';
 import { EnvBadge } from '@/components/layout/EnvBadge';
 import { MaintenanceScreen } from '@/components/layout/MaintenanceScreen';
 import { StatusBanners } from '@/components/layout/StatusBanners';
@@ -15,6 +16,9 @@ import { refreshSession } from '@/lib/session';
 import { useAuthStore } from '@/stores/authStore';
 
 import { PageLoader } from './PageLoader';
+import { useRealtimeSync } from './useRealtimeSync';
+
+const ADMIN_PREFIX = '/admin';
 
 const ACCOUNT_STATE_CODES = [
   'ACCOUNT_PENDING',
@@ -48,6 +52,7 @@ function useGlobalApiErrors(): void {
 /** 모든 화면을 감싸는 틀: 환경 배지, 상단 배너, 점검 화면, 토스트, 위기 안내. */
 export function AppShell() {
   useGlobalApiErrors();
+  useRealtimeSync();
   const { data: config } = useAppConfig();
   const role = useAuthStore((state) => state.me?.role);
   const { pathname } = useLocation();
@@ -55,7 +60,7 @@ export function AppShell() {
   // 어드민은 점검 중에도 접속할 수 있다. 로그인 화면은 어드민이 들어올 수 있게 열어 둔다 (TRD 17-8)
   const maintenance = config?.maintenance?.on === true && role !== 'admin' && pathname !== '/login';
 
-  return (
+  const content = (
     <>
       <EnvBadge />
       <StatusBanners />
@@ -69,8 +74,23 @@ export function AppShell() {
           <Outlet />
         </Suspense>
       )}
+    </>
+  );
+  const overlays = (
+    <>
       <Toaster />
       <CrisisModal />
     </>
   );
+
+  // 어드민은 표 중심의 데스크톱 화면이라 웹앱 틀을 쓰지 않고 창 전체를 쓴다
+  if (pathname.startsWith(ADMIN_PREFIX)) {
+    return (
+      <>
+        {content}
+        {overlays}
+      </>
+    );
+  }
+  return <AppFrame overlays={overlays}>{content}</AppFrame>;
 }
