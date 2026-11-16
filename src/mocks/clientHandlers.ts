@@ -126,6 +126,10 @@ export const clientHandlers = [
     const me = currentUser(request);
     if (!me) return unauthenticated();
     const body = (await request.json()) as Schema<'IntakeCreateRequest'>;
+    // 실제 서버처럼 예/아니오 값이 빠진 본문은 형식 오류로 돌려보낸다
+    if (typeof body.share_raw !== 'boolean' || typeof body.notify_when_available !== 'boolean') {
+      return errorResponse(400, 'BAD_REQUEST', '요청 형식이 올바르지 않습니다');
+    }
     if (Array.from(body.text).length < MIN_INTAKE_CHARS) {
       return errorResponse(422, 'VALIDATION_ERROR', '입력값을 확인해 주세요', {
         fields: { text: '20자 이상 적어 주세요' },
