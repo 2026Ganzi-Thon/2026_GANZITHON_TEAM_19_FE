@@ -20,8 +20,10 @@ export function Chip({
       aria-pressed={selected}
       className={cx(
         // 보이는 높이는 시안대로 두고 터치 영역만 44px 로 넓힌다
-        'relative min-w-24 rounded-md px-2 py-2 text-center text-micro text-fg after:absolute after:inset-x-0 after:-inset-y-1.5',
-        selected ? 'bg-brand-yellow font-bold' : 'bg-chip',
+        'relative min-w-24 rounded-md px-2 py-2 text-center text-micro text-fg button-feedback after:absolute after:inset-x-0 after:-inset-y-1.5',
+        selected
+          ? 'bg-brand-yellow font-bold'
+          : 'bg-chip enabled:hover:bg-chip-hover enabled:active:bg-chip-hover',
         className,
       )}
       {...rest}

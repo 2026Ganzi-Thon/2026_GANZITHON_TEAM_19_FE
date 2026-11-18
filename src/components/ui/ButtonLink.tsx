@@ -18,9 +18,11 @@ interface ButtonLinkProps {
 const BASE =
   'flex min-h-(--size-button) w-full items-center justify-center rounded-sm px-4 text-body font-bold';
 
+// 반응(button-feedback)은 누를 수 있는 링크에만 준다. 비활성 모양은 가만히 있는다
 const VARIANT_CLASS: Record<Variant, string> = {
-  primary: 'bg-action text-fg-inverse hover:bg-action-hover',
-  secondary: 'border border-brand-green bg-surface text-fg hover:bg-field',
+  primary: 'button-feedback bg-action text-fg-inverse hover:bg-action-hover active:bg-action-hover',
+  secondary:
+    'button-feedback border border-brand-green bg-surface text-fg hover:bg-field active:bg-field',
 };
 
 /** 버튼 모양의 화면 이동 링크. */

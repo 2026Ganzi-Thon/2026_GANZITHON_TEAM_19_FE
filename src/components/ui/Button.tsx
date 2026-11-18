@@ -16,11 +16,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_CLASS: Record<Variant, string> = {
-  primary: 'bg-action text-fg-inverse hover:bg-action-hover disabled:bg-action-disabled',
+  primary:
+    'bg-action text-fg-inverse hover:bg-action-hover active:bg-action-hover disabled:bg-action-disabled',
   secondary:
-    'border border-brand-green bg-surface text-fg hover:bg-field disabled:border-border disabled:text-fg-muted',
-  ghost: 'bg-transparent text-fg hover:bg-field disabled:text-fg-muted',
-  danger: 'bg-danger text-fg-inverse disabled:bg-action-disabled',
+    'border border-brand-green bg-surface text-fg enabled:hover:bg-field enabled:active:bg-field disabled:border-border disabled:text-fg-muted',
+  ghost:
+    'bg-transparent text-fg enabled:hover:bg-field enabled:active:bg-field disabled:text-fg-muted',
+  danger:
+    'bg-danger text-fg-inverse hover:bg-danger-hover active:bg-danger-hover disabled:bg-action-disabled',
 };
 
 // 가장 작은 크기도 터치 영역은 44px 이 되게 가상 요소로 넓힌다 (TRD 18-1, 18-3)
@@ -47,7 +50,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
-        'relative inline-flex items-center justify-center gap-2 rounded-sm font-bold transition-colors disabled:cursor-not-allowed',
+        'relative inline-flex items-center justify-center gap-2 rounded-sm font-bold button-feedback disabled:cursor-not-allowed',
         VARIANT_CLASS[variant],
         SIZE_CLASS[size],
         block && 'w-full',
