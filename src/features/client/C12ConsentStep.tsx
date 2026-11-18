@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { grantConsent } from '@/api/endpoints/consents';
+import { grantConsent, TRANSFER_CONSENT_VERSION } from '@/api/endpoints/consents';
 import { updateReferralSessions } from '@/api/endpoints/referrals';
 import { getReport } from '@/api/endpoints/reports';
 import { isApiError } from '@/api/errors';
@@ -60,13 +60,21 @@ export function ConsentStep({ detail, referralId, expertId }: ConsentStepProps) 
     if (ready) track('referral_report_previewed');
   }, [ready]);
 
+  const target = {
+    version: TRANSFER_CONSENT_VERSION,
+    referral_id: referralId,
+    target_expert_id: expertId,
+    report_id: reportId,
+    report_version: report.data?.version,
+  };
+
   const consent = useMutation({
     mutationFn: async () => {
       if (reportChecked) {
-        await grantConsent({ type: 'report_transfer', referral_id: referralId });
+        await grantConsent({ ...target, type: 'report_transfer' });
       }
       if (transcriptChecked) {
-        await grantConsent({ type: 'transcript_transfer', referral_id: referralId });
+        await grantConsent({ ...target, type: 'transcript_transfer' });
       }
     },
     onSuccess: () => {
@@ -145,7 +153,11 @@ export function ConsentStep({ detail, referralId, expertId }: ConsentStepProps) 
             <h2 className="font-bold text-fg">{REFERRAL.timelineTitle}</h2>
             <ReportTimeline
               sources={report.data.sources ?? []}
-              lines={report.data.client_summary.sessions}
+              lines={
+                typeof report.data.client_summary === 'string'
+                  ? undefined
+                  : report.data.client_summary.sessions
+              }
             />
           </section>
           <section className="pt-2.5">

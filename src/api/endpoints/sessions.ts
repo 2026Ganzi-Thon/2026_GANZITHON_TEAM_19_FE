@@ -3,16 +3,17 @@ import type { PendingSessionFields, SessionCreateRequest } from '@/api/pending';
 import type { ProviderSessionFields } from '@/api/pendingProvider';
 import type { Schema } from '@/api/types';
 
-// report·can_rebook 은 아직 배포 전이라 지금 서버 응답에는 없다 (api/pending.ts)
+// report·can_rebook 은 아직 서버 응답에 없다 (api/pending.ts)
 export type Session = Schema<'SessionResponse'> & PendingSessionFields & ProviderSessionFields;
 export type SessionStatus = NonNullable<Session['status']>;
+export type CreatedSession = Schema<'SessionCreateResponse'>;
 
 /** SES-01. 10분 홀드된 결제 대기 세션을 만든다. 같은 선택의 재시도에는 같은 멱등 키를 쓴다 */
 export async function createSession(
   body: SessionCreateRequest,
   idempotencyKey: string,
-): Promise<Session> {
-  const { data } = await api.post<Session>('/sessions', body, {
+): Promise<CreatedSession> {
+  const { data } = await api.post<CreatedSession>('/sessions', body, {
     headers: idempotencyHeader(idempotencyKey),
   });
   return data;

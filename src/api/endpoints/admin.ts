@@ -5,7 +5,6 @@ import type {
   AdminStrikeRow,
   ClientSanctionRow,
   ComplaintDecision,
-  Kpi,
   RiskEvent,
 } from '@/api/pendingAdmin';
 import type { Schema } from '@/api/types';
@@ -103,8 +102,8 @@ export async function paySettlements(ids: string[]): Promise<Schema<'SettlementP
 }
 
 /** KPI-01 (배포 전) */
-export async function getKpi(params: { from: string; to: string }): Promise<Kpi> {
-  const { data } = await api.get<Kpi>('/admin/kpi', { params });
+export async function getKpi(params: { from: string; to: string }): Promise<Schema<'KpiResponse'>> {
+  const { data } = await api.get<Schema<'KpiResponse'>>('/admin/kpi', { params });
   return data;
 }
 

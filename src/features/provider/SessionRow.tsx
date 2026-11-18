@@ -38,7 +38,7 @@ export function SessionRow({ session, now, base, detailed = false }: SessionRowP
         session.supervision_ready && PROVIDER_SESSIONS.supervisionReady,
       ].filter(Boolean)
     : [];
-  const open = session.status === 'CONFIRMED' || session.status === 'IN_PROGRESS';
+  const open = session.status === 'confirmed' || session.status === 'in_progress';
 
   return (
     <li className="flex items-center justify-between gap-3 border-b border-line py-3 text-body-sm">

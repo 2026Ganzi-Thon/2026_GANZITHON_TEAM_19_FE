@@ -20,13 +20,20 @@ export const reportHandlers = [
   http.get(url('/me/reports/:reportId'), ({ request, params }) => {
     if (!currentUser(request)) return unauthenticated();
     const report = reportView(String(params.reportId));
-    return report ? HttpResponse.json(report) : notFound();
+    // 서버처럼 요약을 JSON 글자로 준다
+    return report
+      ? HttpResponse.json({
+          ...report,
+          client_summary: report.client_summary && JSON.stringify(report.client_summary),
+        })
+      : notFound();
   }),
 
   http.post(url('/referrals'), ({ request }) => {
     const me = currentUser(request);
     if (!me) return unauthenticated();
-    return HttpResponse.json(createReferral(me.id));
+    const created = createReferral(me.id).referral;
+    return HttpResponse.json({ id: created.id, status: created.status }, { status: 201 });
   }),
 
   http.get(url('/referrals/:referralId'), ({ request, params }) => {
@@ -36,7 +43,7 @@ export const reportHandlers = [
     return HttpResponse.json(referralView(String(params.referralId)));
   }),
 
-  http.post(url('/referrals/:referralId/select-expert'), async ({ request, params }) => {
+  http.put(url('/referrals/:referralId/expert'), async ({ request, params }) => {
     const me = currentUser(request);
     if (!me) return unauthenticated();
     const stored = ownReferral(params.referralId, me.id);
@@ -97,7 +104,7 @@ export const reportHandlers = [
     if (!me) return unauthenticated();
     const body = (await request.json()) as ConsentCreateRequest;
     const stored = ownReferral(body.referral_id, me.id);
-    const view = referralView(body.referral_id);
+    const view = referralView(body.referral_id ?? '');
     if (!stored || !view) return notFound();
     if (!stored.detail.referral.expert_id) {
       return errorResponse(409, 'INVALID_STATE', '전문가를 먼저 선택해 주세요');
@@ -129,7 +136,7 @@ export const reportHandlers = [
     return noContent();
   }),
 
-  http.post(url('/consents/:consentId/revoke'), ({ request, params }) => {
+  http.post(url('/consents/:consentId/revoke'), async ({ request, params }) => {
     const me = currentUser(request);
     if (!me) return unauthenticated();
     if (String(params.consentId).startsWith('signup-')) {
@@ -139,6 +146,8 @@ export const reportHandlers = [
       (item) => item.id === params.consentId && item.userId === me.id,
     );
     if (!consent) return notFound();
+    const body = (await request.json()) as { reason?: string };
+    if (!body.reason) return errorResponse(422, 'VALIDATION_ERROR', '철회 사유가 필요합니다');
     consent.revoked_at = new Date().toISOString();
     return noContent();
   }),

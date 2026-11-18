@@ -1,6 +1,7 @@
 import type { Role } from '@/api/types';
 import type { NavItem } from '@/components/layout/NavItems';
 import { NAV } from '@/copy/fixed';
+import { SERVER_HAS } from '@/lib/serverFeatures';
 
 const ACCOUNT_ITEMS: readonly NavItem[] = [
   { to: '/notifications', label: NAV.notifications },
@@ -15,12 +16,18 @@ const ROLE_ITEMS: Record<Role, readonly NavItem[]> = {
   trainee: [
     { to: '/t', label: NAV.home, end: true },
     { to: '/t/sessions', label: NAV.trainee.sessions },
-    { to: '/t/supervisions', label: NAV.trainee.supervisions },
+    ...(SERVER_HAS.supervisionFeedback
+      ? [{ to: '/t/supervisions', label: NAV.trainee.supervisions }]
+      : []),
   ],
   expert: [
     { to: '/e', label: NAV.home, end: true },
-    { to: '/e/referrals', label: NAV.expert.referrals },
-    { to: '/e/supervisions', label: NAV.expert.supervisions },
+    ...(SERVER_HAS.expertInbox
+      ? [
+          { to: '/e/referrals', label: NAV.expert.referrals },
+          { to: '/e/supervisions', label: NAV.expert.supervisions },
+        ]
+      : []),
   ],
   // 어드민은 하단 탭 대신 자체 메뉴를 쓴다
   admin: [],

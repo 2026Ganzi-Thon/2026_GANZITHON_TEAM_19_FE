@@ -13,6 +13,7 @@ import { COMPLAINT } from '@/copy/referral';
 import { SETTLEMENTS } from '@/copy/work';
 import { cx } from '@/lib/cx';
 import { formatKST } from '@/lib/date';
+import { SERVER_HAS } from '@/lib/serverFeatures';
 
 import { currentMonth, useMySettlements, useMyStrikes } from './queries';
 
@@ -71,7 +72,7 @@ function SettlementList({ expert }: { expert: boolean }) {
             {item.status === 'locked' && (
               <p className="pt-1 text-micro text-fg-muted">
                 {SETTLEMENTS.lockedHint}
-                {item.supervision_id && (
+                {SERVER_HAS.expertInbox && item.supervision_id && (
                   <>
                     {' '}
                     <Link
@@ -138,13 +139,14 @@ function StrikeList() {
 /** T-10 정산·스트라이크 내역, E-09 정산 내역 (STL-01, CMP-05) */
 export function SettlementView({ expert }: { expert: boolean }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const strikesTab = !expert && searchParams.get(TAB_PARAM) === 'strikes';
+  const showStrikes = !expert && SERVER_HAS.strikes;
+  const strikesTab = showStrikes && searchParams.get(TAB_PARAM) === 'strikes';
 
   return (
     <Screen>
       <ScreenHeader backTo={expert ? '/e' : '/t'} />
       <h1 className="pt-6.5 text-title-sm font-bold text-fg">{SETTLEMENTS.title}</h1>
-      {!expert && (
+      {showStrikes && (
         <div role="group" aria-label={SETTLEMENTS.tabsLabel} className="flex gap-1.5 pt-4">
           <Chip selected={!strikesTab} onClick={() => setSearchParams({}, { replace: true })}>
             {SETTLEMENTS.tabSettlements}

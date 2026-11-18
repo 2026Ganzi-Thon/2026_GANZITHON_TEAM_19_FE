@@ -9,11 +9,11 @@ const RECENT_COUNT = 3;
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
 
-const ACTIVE_STATUSES: ReadonlyArray<Session['status']> = ['CONFIRMED', 'IN_PROGRESS'];
+const ACTIVE_STATUSES: ReadonlyArray<Session['status']> = ['confirmed', 'in_progress'];
 const UPCOMING_STATUSES: ReadonlyArray<Session['status']> = [
-  'PENDING_PAYMENT',
-  'CONFIRMED',
-  'IN_PROGRESS',
+  'pending_payment',
+  'confirmed',
+  'in_progress',
 ];
 const PROFESSIONAL_TRACKS: ReadonlyArray<string | undefined> = ['professional', 'expert'];
 
@@ -40,7 +40,7 @@ export function pickUpcoming(sessions: readonly Session[], now: number): Session
 /** 최근 끝난 상담 3건 */
 export function pickRecent(sessions: readonly Session[]): Session[] {
   return sessions
-    .filter((session) => session.status === 'COMPLETED')
+    .filter((session) => session.status === 'completed')
     .sort((a, b) => startTime(b) - startTime(a))
     .slice(0, RECENT_COUNT);
 }
@@ -60,8 +60,8 @@ export function splitSessions(sessions: readonly Session[]): {
 }
 
 export function canEnter(session: Session, now: number): boolean {
-  if (session.status === 'IN_PROGRESS') return true;
-  if (session.status !== 'CONFIRMED') return false;
+  if (session.status === 'in_progress') return true;
+  if (session.status !== 'confirmed') return false;
   return startTime(session) - now <= ENTER_BEFORE_MINUTES * MINUTE_MS;
 }
 
@@ -100,7 +100,7 @@ export function trackLabel(session: Session): string {
 export const COMPLAINT_WINDOW_DAYS = 7;
 
 export function isComplaintOpen(session: Session, now: number): boolean {
-  if (session.status !== 'COMPLETED' && session.status !== 'NO_SHOW') return false;
+  if (session.status !== 'completed' && session.status !== 'no_show') return false;
   const endedAt = session.scheduled_end ? Date.parse(session.scheduled_end) : startTime(session);
   return now - endedAt <= COMPLAINT_WINDOW_DAYS * 24 * HOUR_MS;
 }

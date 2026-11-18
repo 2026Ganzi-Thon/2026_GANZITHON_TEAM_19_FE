@@ -12,6 +12,7 @@ import { authClient } from '@/lib/auth';
 import { beep, unlockBeep } from '@/lib/beep';
 import { cx } from '@/lib/cx';
 import { onEvent } from '@/lib/realtime';
+import { SERVER_HAS } from '@/lib/serverFeatures';
 
 const BADGE_STALE_MS = 15_000;
 
@@ -40,6 +41,7 @@ export function AdminLayout() {
   const risks = useQuery({
     queryKey: queryKeys.admin('risks', { status: 'open' }),
     queryFn: () => listRiskEvents({ status: 'open' }),
+    enabled: SERVER_HAS.adminRisks,
     staleTime: BADGE_STALE_MS,
   });
   const credentials = useQuery({
@@ -73,7 +75,9 @@ export function AdminLayout() {
 
   // 사이드바 순서는 TRD 16장 공통 레이아웃을 따른다
   const menu: MenuItem[] = [
-    { to: '/admin/risks', label: ADMIN.menu.risks, badge: risks.data?.length },
+    ...(SERVER_HAS.adminRisks
+      ? [{ to: '/admin/risks', label: ADMIN.menu.risks, badge: risks.data?.length }]
+      : []),
     {
       to: '/admin/credentials',
       label: ADMIN.menu.credentials,

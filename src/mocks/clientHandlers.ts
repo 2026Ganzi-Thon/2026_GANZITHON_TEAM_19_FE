@@ -54,7 +54,7 @@ function sessionView(session: MockSession, viewerId: string | undefined) {
     client_nickname: client?.nickname ?? '내담자',
     category: 'burnout',
     visit_no: earlier.length,
-    supervision_ready: session.status === 'COMPLETED',
+    supervision_ready: session.status === 'completed',
     intake_summary: {
       category: 'burnout',
       ai_tags: { emotions: ['무기력', '좌절'], distortions: ['당위적 사고'] },
@@ -86,10 +86,10 @@ function holdExpired(sessionId: string): boolean {
 function expireHolds(): void {
   mockDb.sessions
     .filter(
-      (session) => session.status === 'PENDING_PAYMENT' && holdExpired(session.session_id ?? ''),
+      (session) => session.status === 'pending_payment' && holdExpired(session.session_id ?? ''),
     )
     .forEach((session) => {
-      session.status = 'CANCELLED';
+      session.status = 'cancelled';
       releaseSlot(session.session_id ?? '');
     });
 }
@@ -199,7 +199,7 @@ export const clientHandlers = [
     const session: MockSession = {
       session_id: crypto.randomUUID(),
       track: provider?.track === 'expert' ? 'professional' : 'coaching',
-      status: 'PENDING_PAYMENT',
+      status: 'pending_payment',
       client_id: me.id,
       provider_id: slot.provider_id,
       scheduled_start: slot.start_at,
@@ -225,10 +225,10 @@ export const clientHandlers = [
     if (!me) return unauthenticated();
     const session = findSession(params.sessionId, me.id);
     if (!session) return notFound();
-    if (session.status !== 'CONFIRMED' && session.status !== 'PENDING_PAYMENT') {
+    if (session.status !== 'confirmed' && session.status !== 'pending_payment') {
       return errorResponse(409, 'INVALID_STATE', '지금 상태에서는 할 수 없는 요청입니다');
     }
-    session.status = 'CANCELLED';
+    session.status = 'cancelled';
     releaseSlot(session.session_id ?? '');
     return noContent();
   }),
@@ -281,7 +281,7 @@ export const clientHandlers = [
     const body = (await request.json()) as Schema<'PaymentPrepareRequest'>;
     const session = findSession(body.session_id, me.id);
     if (!session) return notFound();
-    if (session.status !== 'PENDING_PAYMENT') {
+    if (session.status !== 'pending_payment') {
       return errorResponse(409, 'INVALID_STATE', '지금 상태에서는 할 수 없는 요청입니다');
     }
     if (holdExpired(body.session_id)) {
@@ -307,12 +307,12 @@ export const clientHandlers = [
     const order = mockDb.orders.get(body.order_id);
     const session = order ? findSession(order.session_id, me.id) : undefined;
     if (!order || !session) return notFound();
-    if (session.status === 'PENDING_PAYMENT' && holdExpired(order.session_id)) {
+    if (session.status === 'pending_payment' && holdExpired(order.session_id)) {
       return errorResponse(410, 'HOLD_EXPIRED', '예약 대기 시간이 지났습니다');
     }
     const slot = mockDb.slots.find((item) => item.id === mockDb.sessionSlots.get(order.session_id));
     if (slot) slot.status = 'booked';
-    session.status = 'CONFIRMED';
+    session.status = 'confirmed';
     mockDb.holds.delete(order.session_id);
     const confirmed: Schema<'PaymentConfirmResponse'> = {
       payment_id: crypto.randomUUID(),

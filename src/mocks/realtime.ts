@@ -128,11 +128,11 @@ export function createMockTransport(handlers: TransportHandlers): RealtimeTransp
       reply(reqId, false, { error: 'FORBIDDEN_RESOURCE' });
       return;
     }
-    if (session.status !== 'CONFIRMED' && session.status !== 'IN_PROGRESS') {
+    if (session.status !== 'confirmed' && session.status !== 'in_progress') {
       reply(reqId, false, { error: 'INVALID_STATE' });
       return;
     }
-    session.status = 'IN_PROGRESS';
+    session.status = 'in_progress';
     reply(reqId, true, { session_status: session.status });
 
     const history = mockDb.messages.get(sessionId) ?? [];
@@ -167,7 +167,7 @@ export function createMockTransport(handlers: TransportHandlers): RealtimeTransp
       reply(reqId, false, { error: 'FORBIDDEN_RESOURCE' });
       return;
     }
-    if (session.status !== 'IN_PROGRESS') {
+    if (session.status !== 'in_progress') {
       reply(reqId, false, { error: 'INVALID_STATE' });
       return;
     }
@@ -217,7 +217,7 @@ export function createMockTransport(handlers: TransportHandlers): RealtimeTransp
     if (text.includes(END_KEYWORD)) {
       later(() => providerSays(session, FAREWELL), TYPING_MS);
       later(() => {
-        session.status = 'COMPLETED';
+        session.status = 'completed';
         emit('session:ended', { session_id: sessionId, ended_by: 'provider' });
         const reportId = createSessionReport(sessionId);
         later(

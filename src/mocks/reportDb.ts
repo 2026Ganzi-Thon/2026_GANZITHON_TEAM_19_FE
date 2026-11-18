@@ -154,7 +154,7 @@ export function createReferral(clientId: string | undefined): ReferralDetail {
     .filter(
       (session) =>
         session.client_id === clientId &&
-        session.status === 'COMPLETED' &&
+        session.status === 'completed' &&
         session.track !== 'professional' &&
         reportDb.sessionReports.has(session.session_id ?? ''),
     )

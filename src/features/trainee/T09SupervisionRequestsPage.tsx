@@ -31,7 +31,7 @@ function RequestForm() {
   const length = countChars(question.trim());
   // 연계되지 않은 완료 세션만 요청할 수 있다
   const candidates = (sessions.data ?? []).filter(
-    (session) => session.status === 'COMPLETED' && !session.referral_id,
+    (session) => session.status === 'completed' && !session.referral_id,
   );
 
   const submission = useMutation({

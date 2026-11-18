@@ -20,7 +20,7 @@ function session(overrides: Partial<Session>): Session {
   return {
     session_id: 's',
     track: 'coaching',
-    status: 'CONFIRMED',
+    status: 'confirmed',
     scheduled_start: '2026-11-03T10:00:00Z',
     scheduled_end: '2026-11-03T10:30:00Z',
     ...overrides,
@@ -36,7 +36,7 @@ describe('pickUpcoming', () => {
         scheduled_end: '2026-11-05T10:30:00Z',
       }),
       session({ session_id: 'next' }),
-      session({ session_id: 'done', status: 'COMPLETED' }),
+      session({ session_id: 'done', status: 'completed' }),
       session({
         session_id: 'past',
         scheduled_start: '2026-11-01T10:00:00Z',
@@ -48,7 +48,7 @@ describe('pickUpcoming', () => {
   });
 
   it('returns nothing when there is no session to come', () => {
-    expect(pickUpcoming([session({ status: 'CANCELLED' })], NOW)).toBeNull();
+    expect(pickUpcoming([session({ status: 'cancelled' })], NOW)).toBeNull();
   });
 });
 
@@ -57,7 +57,7 @@ describe('pickRecent', () => {
     const sessions = ['01', '02', '03', '04'].map((day) =>
       session({
         session_id: day,
-        status: 'COMPLETED',
+        status: 'completed',
         scheduled_start: `2026-10-${day}T10:00:00Z`,
       }),
     );
@@ -70,13 +70,13 @@ describe('splitSessions', () => {
   it('puts unpaid, confirmed and running sessions under upcoming, nearest first', () => {
     const { upcoming, past } = splitSessions([
       session({ session_id: 'confirmed', scheduled_start: '2026-11-05T10:00:00Z' }),
-      session({ session_id: 'unpaid', status: 'PENDING_PAYMENT' }),
+      session({ session_id: 'unpaid', status: 'pending_payment' }),
       session({
         session_id: 'running',
-        status: 'IN_PROGRESS',
+        status: 'in_progress',
         scheduled_start: '2026-11-03T08:50:00Z',
       }),
-      session({ session_id: 'done', status: 'COMPLETED' }),
+      session({ session_id: 'done', status: 'completed' }),
     ]);
 
     expect(upcoming.map((item) => item.session_id)).toEqual(['running', 'unpaid', 'confirmed']);
@@ -85,11 +85,11 @@ describe('splitSessions', () => {
 
   it('lists finished, cancelled and missed sessions under past, newest first', () => {
     const { past } = splitSessions([
-      session({ session_id: 'old', status: 'COMPLETED', scheduled_start: '2026-10-01T10:00:00Z' }),
-      session({ session_id: 'missed', status: 'NO_SHOW', scheduled_start: '2026-10-20T10:00:00Z' }),
+      session({ session_id: 'old', status: 'completed', scheduled_start: '2026-10-01T10:00:00Z' }),
+      session({ session_id: 'missed', status: 'no_show', scheduled_start: '2026-10-20T10:00:00Z' }),
       session({
         session_id: 'cancelled',
-        status: 'CANCELLED',
+        status: 'cancelled',
         scheduled_start: '2026-10-10T10:00:00Z',
       }),
     ]);
@@ -112,15 +112,15 @@ describe('canEnter', () => {
 
   it('always lets the client into a session in progress', () => {
     expect(
-      canEnter(session({ status: 'IN_PROGRESS', scheduled_start: '2026-11-04T10:00:00Z' }), NOW),
+      canEnter(session({ status: 'in_progress', scheduled_start: '2026-11-04T10:00:00Z' }), NOW),
     ).toBe(true);
   });
 
   it('keeps unpaid and finished sessions closed even at the start time', () => {
     const atStart = Date.parse('2026-11-03T10:00:00Z');
 
-    expect(canEnter(session({ status: 'PENDING_PAYMENT' }), atStart)).toBe(false);
-    expect(canEnter(session({ status: 'COMPLETED' }), atStart)).toBe(false);
+    expect(canEnter(session({ status: 'pending_payment' }), atStart)).toBe(false);
+    expect(canEnter(session({ status: 'completed' }), atStart)).toBe(false);
   });
 });
 
@@ -154,7 +154,7 @@ describe('trackLabel', () => {
 });
 
 describe('isComplaintOpen', () => {
-  const ended = session({ status: 'COMPLETED', scheduled_end: '2026-11-03T10:30:00Z' });
+  const ended = session({ status: 'completed', scheduled_end: '2026-11-03T10:30:00Z' });
 
   it('accepts a complaint until seven days after the session ended', () => {
     expect(isComplaintOpen(ended, Date.parse('2026-11-10T10:30:00Z'))).toBe(true);
@@ -164,8 +164,8 @@ describe('isComplaintOpen', () => {
   it('covers a missed session but not one that has not finished', () => {
     const now = Date.parse('2026-11-04T00:00:00Z');
 
-    expect(isComplaintOpen({ ...ended, status: 'NO_SHOW' }, now)).toBe(true);
-    expect(isComplaintOpen({ ...ended, status: 'CONFIRMED' }, now)).toBe(false);
-    expect(isComplaintOpen({ ...ended, status: 'CANCELLED' }, now)).toBe(false);
+    expect(isComplaintOpen({ ...ended, status: 'no_show' }, now)).toBe(true);
+    expect(isComplaintOpen({ ...ended, status: 'confirmed' }, now)).toBe(false);
+    expect(isComplaintOpen({ ...ended, status: 'cancelled' }, now)).toBe(false);
   });
 });

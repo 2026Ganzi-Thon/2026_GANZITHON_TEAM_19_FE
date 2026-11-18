@@ -62,7 +62,7 @@ export const accountHandlers = [
     const active = mockDb.sessions.some(
       (session) =>
         (session.client_id === me.id || session.provider_id === me.id) &&
-        (session.status === 'CONFIRMED' || session.status === 'IN_PROGRESS'),
+        (session.status === 'confirmed' || session.status === 'in_progress'),
     );
     if (active) {
       return errorResponse(409, 'ACTIVE_SESSIONS_EXIST', '예정되거나 진행 중인 상담이 있습니다');

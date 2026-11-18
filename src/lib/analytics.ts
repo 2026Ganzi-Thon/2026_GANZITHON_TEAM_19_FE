@@ -1,5 +1,6 @@
 import { getIdToken } from './auth';
 import { env } from './env';
+import { SERVER_HAS } from './serverFeatures';
 
 // KPI 이벤트 수집 (TRD 17-6). 민감정보(고민 내용, 닉네임)는 props 에 넣지 않는다.
 export type EventName =
@@ -40,7 +41,7 @@ const EVENTS_PATH = '/events';
 let queue: QueuedEvent[] = [];
 
 async function send(events: QueuedEvent[]): Promise<void> {
-  if (events.length === 0 || !env.apiBaseUrl) return;
+  if (events.length === 0 || !env.apiBaseUrl || !SERVER_HAS.analytics) return;
   try {
     const token = await getIdToken();
     await fetch(`${env.apiBaseUrl}${EVENTS_PATH}`, {
@@ -70,7 +71,7 @@ export function flushEvents(): void {
 
 /** 페이지를 떠날 때 남은 이벤트를 보낸다. */
 export function flushEventsOnLeave(): void {
-  if (queue.length === 0 || !env.apiBaseUrl) return;
+  if (queue.length === 0 || !env.apiBaseUrl || !SERVER_HAS.analytics) return;
   const events = queue;
   queue = [];
   const body = new Blob([JSON.stringify({ events })], { type: 'application/json' });

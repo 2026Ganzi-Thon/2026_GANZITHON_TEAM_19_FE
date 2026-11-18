@@ -21,6 +21,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/referrals/{referralId}/expert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["expert"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/provider-profile": {
         parameters: {
             query?: never;
@@ -49,6 +65,72 @@ export interface paths {
         /** 운영 설정 변경 (키별 형식 검증, 감사 로그, 즉시 반영) */
         put: operations["ADM-07"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supervisions/{supervisionId}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supervision-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/supervision-requests/{requestId}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 세션 목록 */
+        get: operations["SES-02"];
+        put?: never;
+        /** 예약 생성 (슬롯 10분 홀드, 결제 대기) */
+        post: operations["SES-01"];
         delete?: never;
         options?: never;
         head?: never;
@@ -133,6 +215,70 @@ export interface paths {
         put?: never;
         /** 세션 취소 */
         post: operations["SES-04"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risk-events/{eventId}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risk-events/{eventId}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["acknowledge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/referrals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/referrals/{referralId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -363,6 +509,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 리포트 또는 전사본 전송 동의 */
+        post: operations["CNS-02"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/consents/{consentId}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 전송 동의 철회 */
+        post: operations["CNS-03"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/register": {
         parameters: {
             query?: never;
@@ -414,6 +594,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/reports/{reportId}/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RPT-03"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/credentials/{userId}/decision": {
         parameters: {
             query?: never;
@@ -442,7 +638,8 @@ export interface paths {
         get: operations["USR-01"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** 회원 탈퇴 */
+        delete: operations["USR-03"];
         options?: never;
         head?: never;
         /** 닉네임 수정 (가입과 같은 규칙, 중복 409) */
@@ -483,15 +680,14 @@ export interface paths {
         patch: operations["ADM-05_1"];
         trace?: never;
     };
-    "/sessions": {
+    "/supervisions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 내 세션 목록 */
-        get: operations["SES-02"];
+        get: operations["list_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -509,6 +705,39 @@ export interface paths {
         };
         /** 세션 상세 */
         get: operations["SES-03"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{sessionId}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 같은 내담자와의 이전 회기 이력 */
+        get: operations["SES-09"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/risk-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -636,6 +865,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/reports/{reportId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RPT-01"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 동의 이력 조회 */
+        get: operations["CNS-01"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/intakes/{intakeId}/matches": {
         parameters: {
             query?: never;
@@ -662,6 +924,22 @@ export interface paths {
         };
         /** 헬스체크 */
         get: operations["HLT-01"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expert/reports/{reportId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RPT-02"];
         put?: never;
         post?: never;
         delete?: never;
@@ -713,6 +991,22 @@ export interface paths {
         };
         /** 운영 설정 전체 (price_configs) */
         get: operations["ADM-06"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/kpi": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["dashboard"];
         put?: never;
         post?: never;
         delete?: never;
@@ -796,6 +1090,22 @@ export interface components {
         SessionNoteRequest: {
             note: string;
         };
+        ReferralExpertRequest: {
+            /** Format: uuid */
+            expert_id: string;
+        };
+        ReferralResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            source_session_id?: string;
+            /** Format: uuid */
+            expert_id?: string;
+            status?: string;
+            reason?: string;
+            /** Format: date-time */
+            created_at?: string;
+        };
         CareerItem: {
             org: string;
             from: string;
@@ -870,6 +1180,43 @@ export interface components {
             /** Format: date-time */
             updated_at?: string;
         };
+        SupervisionSubmitRequest: {
+            content: string;
+        };
+        SupervisionRequestCreate: {
+            /** Format: uuid */
+            session_id: string;
+            /** Format: uuid */
+            preferred_expert_id?: string;
+            question: string;
+        };
+        SessionCreateRequest: {
+            /** Format: uuid */
+            slot_id: string;
+            /** Format: uuid */
+            intake_id?: string;
+            /** Format: uuid */
+            referral_id?: string;
+            /** Format: uuid */
+            rebook_of?: string;
+        };
+        SessionCreateResponse: {
+            /** Format: uuid */
+            session_id?: string;
+            /** @enum {string} */
+            status?: "pending_payment" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show";
+            track?: string;
+            /** Format: uuid */
+            provider_id?: string;
+            /** Format: date-time */
+            scheduled_start?: string;
+            /** Format: date-time */
+            scheduled_end?: string;
+            /** Format: int32 */
+            price?: number;
+            /** Format: date-time */
+            hold_expires_at?: string;
+        };
         SessionReviewRequest: {
             /** Format: int32 */
             rating?: number;
@@ -903,6 +1250,14 @@ export interface components {
         };
         SessionCancelRequest: {
             reason: string;
+        };
+        RiskResolutionRequest: {
+            note: string;
+        };
+        ReferralCreateRequest: {
+            /** Format: uuid */
+            source_session_id: string;
+            reason?: string;
         };
         RefundRequest: {
             /** Format: int32 */
@@ -1063,6 +1418,40 @@ export interface components {
         IdentityVerifyResponse: {
             verified?: boolean;
         };
+        ConsentGrantRequest: {
+            type: string;
+            version: string;
+            /** Format: uuid */
+            target_expert_id?: string;
+            /** Format: uuid */
+            report_id?: string;
+            /** Format: int32 */
+            report_version?: number;
+            /** Format: uuid */
+            referral_id?: string;
+        };
+        ConsentResponse: {
+            /** Format: uuid */
+            id?: string;
+            type?: string;
+            version?: string;
+            /** Format: uuid */
+            target_expert_id?: string;
+            /** Format: uuid */
+            report_id?: string;
+            /** Format: int32 */
+            report_version?: number;
+            /** Format: uuid */
+            referral_id?: string;
+            /** Format: date-time */
+            granted_at?: string;
+            /** Format: date-time */
+            revoked_at?: string;
+            revoked_reason?: string;
+        };
+        ConsentRevokeRequest: {
+            reason: string;
+        };
         ConsentItem: {
             type: string;
             version: string;
@@ -1147,12 +1536,32 @@ export interface components {
             /** Format: date-time */
             created_at?: string;
         };
+        SupervisionResponse: {
+            /** Format: uuid */
+            id?: string;
+            kind?: string;
+            /** Format: uuid */
+            referral_id?: string;
+            /** Format: uuid */
+            request_id?: string;
+            /** Format: uuid */
+            coaching_session_id?: string;
+            /** Format: uuid */
+            expert_id?: string;
+            /** Format: uuid */
+            trainee_id?: string;
+            status?: string;
+            /** Format: date-time */
+            due_at?: string;
+            /** Format: date-time */
+            submitted_at?: string;
+        };
         SessionResponse: {
             /** Format: uuid */
             session_id?: string;
             track?: string;
             /** @enum {string} */
-            status?: "PENDING_PAYMENT" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+            status?: "pending_payment" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show";
             /** Format: uuid */
             client_id?: string;
             /** Format: uuid */
@@ -1163,6 +1572,32 @@ export interface components {
             scheduled_end?: string;
             /** Format: int32 */
             rating?: number;
+        };
+        SessionHistoryItem: {
+            /** Format: uuid */
+            session_id?: string;
+            /** Format: date-time */
+            date?: string;
+            /** Format: int32 */
+            mood_before?: number;
+            /** Format: int32 */
+            mood_after?: number;
+            my_note?: string;
+        };
+        RiskEventResponse: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            session_id?: string;
+            /** Format: uuid */
+            message_id?: string;
+            /** Format: uuid */
+            client_id?: string;
+            level?: string;
+            rule_hits?: string[];
+            status?: string;
+            /** Format: date-time */
+            created_at?: string;
         };
         TermsResponse: {
             type?: string;
@@ -1262,6 +1697,19 @@ export interface components {
                 [key: string]: number;
             };
         };
+        ReportResponse: {
+            /** Format: uuid */
+            id?: string;
+            scope?: string;
+            status?: string;
+            /** Format: int32 */
+            version?: number;
+            content?: string;
+            client_summary?: string;
+            risk_level?: string;
+            /** Format: date-time */
+            ready_at?: string;
+        };
         IntakeListItemResponse: {
             /** Format: uuid */
             intake_id?: string;
@@ -1288,6 +1736,15 @@ export interface components {
         PageResponseSettingResponse: {
             items?: components["schemas"]["SettingResponse"][];
             next_cursor?: string;
+        };
+        KpiResponse: {
+            /** Format: date-time */
+            from?: string;
+            /** Format: date-time */
+            to?: string;
+            counts?: {
+                [key: string]: number;
+            };
         };
         CredentialReviewItem: {
             /** Format: uuid */
@@ -1387,6 +1844,32 @@ export interface operations {
             };
         };
     };
+    expert: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referralId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferralExpertRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReferralResponse"];
+                };
+            };
+        };
+    };
     "USR-06": {
         parameters: {
             query?: never;
@@ -1433,6 +1916,124 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SettingResponse"];
+                };
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supervisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupervisionSubmitRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupervisionRequestCreate"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                requestId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    "SES-02": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SessionResponse"][];
+                };
+            };
+        };
+    };
+    "SES-01": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SessionCreateResponse"];
                 };
             };
         };
@@ -1573,6 +2174,116 @@ export interface operations {
                 "application/json": components["schemas"]["SessionCancelRequest"];
             };
         };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RiskResolutionRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    acknowledge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReferralResponse"][];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferralCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReferralResponse"];
+                };
+            };
+        };
+    };
+    cancel: {
+        parameters: {
+            query?: {
+                reason?: string;
+            };
+            header?: never;
+            path: {
+                referralId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description No Content */
             204: {
@@ -1944,6 +2655,54 @@ export interface operations {
             };
         };
     };
+    "CNS-02": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentGrantRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsentResponse"];
+                };
+            };
+        };
+    };
+    "CNS-03": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                consentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentRevokeRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "AUTH-01": {
         parameters: {
             query?: never;
@@ -2016,6 +2775,26 @@ export interface operations {
             };
         };
     };
+    "RPT-03": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reportId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "ADM-03": {
         parameters: {
             query?: never;
@@ -2059,6 +2838,24 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["MeResponse"];
                 };
+            };
+        };
+    };
+    "USR-03": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2138,7 +2935,7 @@ export interface operations {
             };
         };
     };
-    "SES-02": {
+    list_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2153,7 +2950,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SessionResponse"][];
+                    "*/*": components["schemas"]["SupervisionResponse"][];
                 };
             };
         };
@@ -2176,6 +2973,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SessionResponse"];
+                };
+            };
+        };
+    };
+    "SES-09": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SessionHistoryItem"][];
+                };
+            };
+        };
+    };
+    list_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RiskEventResponse"][];
                 };
             };
         };
@@ -2333,6 +3172,48 @@ export interface operations {
             };
         };
     };
+    "RPT-01": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reportId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReportResponse"];
+                };
+            };
+        };
+    };
+    "CNS-01": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsentResponse"][];
+                };
+            };
+        };
+    };
     "INT-02": {
         parameters: {
             query?: never;
@@ -2371,6 +3252,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    "RPT-02": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reportId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReportResponse"];
                 };
             };
         };
@@ -2441,6 +3344,29 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseSettingResponse"];
+                };
+            };
+        };
+    };
+    dashboard: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["KpiResponse"];
                 };
             };
         };

@@ -10,7 +10,8 @@ interface RiskCardProps {
   event: RiskCardEvent;
   /** 대응 문장을 누르면 입력창에 넣는다 */
   onPickScript: (text: string) => void;
-  onCallOncall: () => void;
+  /** 없으면 당직 호출 버튼을 숨긴다 */
+  onCallOncall?: () => void;
   onShareResources: () => void;
   onAcknowledge: () => void;
   busy?: boolean;
@@ -61,9 +62,11 @@ export function RiskCard({
         </>
       )}
       <div className="flex flex-wrap gap-2 pt-2">
-        <button type="button" disabled={busy} onClick={onCallOncall} className={ACTION}>
-          {PROVIDER_ROOM.riskCallOncall}
-        </button>
+        {onCallOncall && (
+          <button type="button" disabled={busy} onClick={onCallOncall} className={ACTION}>
+            {PROVIDER_ROOM.riskCallOncall}
+          </button>
+        )}
         <button type="button" disabled={busy} onClick={onShareResources} className={ACTION}>
           {PROVIDER_ROOM.riskShare}
         </button>

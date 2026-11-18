@@ -65,17 +65,17 @@ function SessionItem({ session, now, onCancel }: SessionItemProps) {
       </p>
       <p className="pt-1 text-body-sm text-fg-muted">{facts.join(' · ')}</p>
       <div className="flex flex-wrap gap-x-5">
-        {status === 'PENDING_PAYMENT' && (
+        {status === 'pending_payment' && (
           <Link to={`/c/checkout/${sessionId}`} className={ACTION}>
             {SESSIONS.pay}
           </Link>
         )}
-        {(status === 'CONFIRMED' || status === 'IN_PROGRESS') && (
+        {(status === 'confirmed' || status === 'in_progress') && (
           <Link to={`/c/sessions/${sessionId}/lobby`} className={ACTION}>
             {SESSIONS.enter}
           </Link>
         )}
-        {(status === 'CONFIRMED' || status === 'PENDING_PAYMENT') && (
+        {(status === 'confirmed' || status === 'pending_payment') && (
           <button type="button" onClick={() => onCancel(session)} className={ACTION}>
             {SESSIONS.cancel}
           </button>
@@ -85,7 +85,7 @@ function SessionItem({ session, now, onCancel }: SessionItemProps) {
             {REPORT.view}
           </Link>
         )}
-        {status === 'COMPLETED' && isCoaching(session) && session.provider_id && (
+        {status === 'completed' && isCoaching(session) && session.provider_id && (
           <Link
             to={`/c/providers/${session.provider_id}?rebook_of=${sessionId}`}
             onClick={() => track('rebook_started')}
@@ -131,7 +131,7 @@ export function C07SessionsPage() {
   const { upcoming, past } = splitSessions(sessions.data ?? []);
   const list = tab === 'upcoming' ? upcoming : past;
   const next = pickUpcoming(sessions.data ?? [], now);
-  const paidTarget = target?.status === 'CONFIRMED';
+  const paidTarget = target?.status === 'confirmed';
 
   return (
     <Screen>

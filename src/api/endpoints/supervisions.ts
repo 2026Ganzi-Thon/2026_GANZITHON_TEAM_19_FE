@@ -50,7 +50,7 @@ export async function getCertificateDownloadUrl(id: string): Promise<string> {
 
 /** SUP-09 */
 export async function requestSupervision(body: SupervisionRequestCreate): Promise<void> {
-  await api.post('/trainee/supervision-requests', body);
+  await api.post('/supervision-requests', body);
 }
 
 /** SUP-10 */
@@ -84,9 +84,7 @@ export async function listSupervisionRequests(): Promise<SupervisionRequestItem[
 
 /** SUP-11 수락. 작성할 슈퍼비전 ID가 돌아온다 */
 export async function acceptSupervisionRequest(id: string): Promise<{ supervision_id: string }> {
-  const { data } = await api.post<{ supervision_id: string }>(
-    `/expert/supervision-requests/${id}/accept`,
-  );
+  const { data } = await api.post<{ supervision_id: string }>(`/supervision-requests/${id}/accept`);
   return data;
 }
 

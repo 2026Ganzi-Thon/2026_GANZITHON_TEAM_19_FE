@@ -53,7 +53,7 @@ function Checkout({ session, sessionId }: CheckoutProps) {
   }));
   const [failed, setFailed] = useState(false);
   const paid = useRef(false);
-  const waitingPayment = session.status === 'PENDING_PAYMENT';
+  const waitingPayment = session.status === 'pending_payment';
   const providerPath = session.provider_id ? `/c/providers/${session.provider_id}` : '/c';
 
   // 주문을 먼저 만들어 본다. 본인인증을 한 적이 없으면 409 가 와서 인증 입력을 보여 준다 (PAY-02)
@@ -66,7 +66,7 @@ function Checkout({ session, sessionId }: CheckoutProps) {
     gcTime: 0,
   });
   const needsIdentity = isApiError(order.error, 'INVALID_STATE');
-  const holdExpired = isApiError(order.error, 'HOLD_EXPIRED') || session.status === 'CANCELLED';
+  const holdExpired = isApiError(order.error, 'HOLD_EXPIRED') || session.status === 'cancelled';
   const orderFailed = order.isError && !needsIdentity && !holdExpired;
 
   const {
@@ -96,7 +96,7 @@ function Checkout({ session, sessionId }: CheckoutProps) {
   }, [holdExpired, expire]);
 
   useEffect(() => {
-    if (paid.current || waitingPayment || session.status === 'CANCELLED') return;
+    if (paid.current || waitingPayment || session.status === 'cancelled') return;
     showToast(CHECKOUT.alreadyConfirmed);
     navigate('/c/sessions', { replace: true });
   }, [waitingPayment, session.status, navigate]);
@@ -123,7 +123,7 @@ function Checkout({ session, sessionId }: CheckoutProps) {
       track('payment_succeeded');
       queryClient.setQueryData<Session>(queryKeys.session(sessionId), {
         ...session,
-        status: 'CONFIRMED',
+        status: 'confirmed',
       });
       void queryClient.invalidateQueries({ queryKey: queryKeys.allSessions });
       showToast(CHECKOUT.confirmed, 'success');

@@ -110,10 +110,10 @@ export const CLIENT_HOME = {
 } as const;
 
 export const SESSION_STATUS_LABEL = {
-  PENDING_PAYMENT: '결제 대기',
-  CONFIRMED: '예약 확정',
-  IN_PROGRESS: '진행 중',
-  COMPLETED: '완료',
-  CANCELLED: '취소',
-  NO_SHOW: '불참',
+  pending_payment: '결제 대기',
+  confirmed: '예약 확정',
+  in_progress: '진행 중',
+  completed: '완료',
+  cancelled: '취소',
+  no_show: '불참',
 } as const;

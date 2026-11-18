@@ -2,12 +2,15 @@ import type { ClientSummary } from '@/api/pending';
 import { REPORT } from '@/copy/referral';
 
 interface ReportCardProps {
-  /** 내담자용 쉬운 말 요약 */
-  summary: ClientSummary;
+  /** 내담자용 쉬운 말 요약. 서버가 문장 하나만 주면 그대로 보여 준다 */
+  summary: ClientSummary | string;
 }
 
 /** 상담 정리 4항목 (TRD C-11). 내담자에게는 쉬운 말로 풀어 쓴 요약만 보여 준다. */
 export function ReportCard({ summary }: ReportCardProps) {
+  if (typeof summary === 'string') {
+    return <p className="whitespace-pre-line pt-2.5 text-body-sm text-fg-muted">{summary}</p>;
+  }
   const items = [
     { title: REPORT.chief, body: summary.chief_complaint },
     { title: REPORT.patterns, body: summary.thinking_patterns },

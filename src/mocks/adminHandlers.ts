@@ -213,7 +213,19 @@ export const adminHandlers = [
     const blocked = denied(request);
     if (blocked) return blocked;
     const params = query(request);
-    return HttpResponse.json(kpi(params.get('from') ?? '', params.get('to') ?? ''));
+    const { north_star, funnel } = kpi(params.get('from') ?? '', params.get('to') ?? '');
+    // 서버처럼 이벤트 5가지 건수만 준다
+    return HttpResponse.json({
+      from: params.get('from'),
+      to: params.get('to'),
+      counts: {
+        signup_completed: north_star.value,
+        intake_created: funnel[0]?.count ?? 0,
+        session_completed: funnel[2]?.count ?? 0,
+        referral_accepted: funnel[3]?.count ?? 0,
+        payment_succeeded: funnel[1]?.count ?? 0,
+      },
+    });
   }),
 
   http.get(url('/admin/risk-events'), ({ request }) => {

@@ -94,7 +94,9 @@ export function C05ProviderPage() {
         showToast(errorCopy('').message, 'error');
         return;
       }
-      setHold(sessionId, Date.now() + HOLD_MS);
+      // 서버가 홀드 만료 시각을 주면 그것을 쓴다
+      const holdUntil = session.hold_expires_at ? Date.parse(session.hold_expires_at) : NaN;
+      setHold(sessionId, Number.isNaN(holdUntil) ? Date.now() + HOLD_MS : holdUntil);
       queryClient.setQueryData(queryKeys.session(sessionId), session);
       void queryClient.invalidateQueries({ queryKey: queryKeys.allSessions });
       navigate(`/c/checkout/${sessionId}`);

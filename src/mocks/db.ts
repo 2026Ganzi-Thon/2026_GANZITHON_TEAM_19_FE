@@ -116,7 +116,7 @@ export const mockDb: MockDb = {
     {
       session_id: '00000000-0000-7000-8000-00000000a001',
       track: 'coaching',
-      status: 'CONFIRMED',
+      status: 'confirmed',
       client_id: CLIENT_ID,
       provider_id: TRAINEE_ID,
       scheduled_start: iso(5 * MINUTE),
@@ -125,7 +125,7 @@ export const mockDb: MockDb = {
     {
       session_id: '00000000-0000-7000-8000-00000000a002',
       track: 'coaching',
-      status: 'COMPLETED',
+      status: 'completed',
       client_id: CLIENT_ID,
       provider_id: TRAINEE_ID,
       scheduled_start: iso(-72 * HOUR),

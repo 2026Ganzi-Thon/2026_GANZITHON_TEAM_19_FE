@@ -71,10 +71,10 @@ describe('realtime', () => {
     server().onReply({
       req_id: wire.sent[0]?.reqId,
       ok: true,
-      data: { session_status: 'IN_PROGRESS' },
+      data: { session_status: 'in_progress' },
     });
 
-    await expect(reply).resolves.toMatchObject({ session_status: 'IN_PROGRESS' });
+    await expect(reply).resolves.toMatchObject({ session_status: 'in_progress' });
   });
 
   it('rejects with the server error code when the server refuses', async () => {
@@ -114,14 +114,14 @@ describe('realtime', () => {
 
     joinRoom('s1', () => 'm7', onJoin);
     const frame = wire.sent[0];
-    server().onReply({ req_id: frame?.reqId, ok: true, session_status: 'IN_PROGRESS' });
+    server().onReply({ req_id: frame?.reqId, ok: true, session_status: 'in_progress' });
 
     expect(frame).toMatchObject({
       event: 'session.join',
       body: { session_id: 's1', after_id: 'm7' },
     });
     await vi.waitFor(() =>
-      expect(onJoin).toHaveBeenCalledWith({ ok: true, sessionStatus: 'IN_PROGRESS' }),
+      expect(onJoin).toHaveBeenCalledWith({ ok: true, sessionStatus: 'in_progress' }),
     );
   });
 

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { acknowledgeRisk, callOncall } from '@/api/endpoints/expert';
+import { acknowledgeRisk, acknowledgeSessionRisks, callOncall } from '@/api/endpoints/expert';
 import { endSession, getSession } from '@/api/endpoints/sessions';
 import { isApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
@@ -21,6 +21,7 @@ import { PROVIDER_ROOM } from '@/copy/room';
 import { trackLabel } from '@/features/client/sessions';
 import { useVisualViewportHeight } from '@/hooks/useVisualViewportHeight';
 import { onEvent, request } from '@/lib/realtime';
+import { SERVER_HAS } from '@/lib/serverFeatures';
 import { showToast } from '@/stores/uiStore';
 
 import { RoomPanel } from './RoomPanel';
@@ -79,7 +80,7 @@ export function RoomView({ role }: RoomViewProps) {
       setEnding(false);
       showToast(PROVIDER_ROOM.ended, 'success');
       // 연계된 전문 상담이면 수련생 슈퍼비전 작성을 안내한다 (TRD E-07)
-      if (!trainee && data?.referral_id) setAskSupervision(true);
+      if (!trainee && data?.referral_id && SERVER_HAS.expertInbox) setAskSupervision(true);
       else navigate(listPath, { replace: true });
     },
     onError: toastError,
@@ -102,12 +103,15 @@ export function RoomView({ role }: RoomViewProps) {
   });
 
   function acknowledge() {
-    // 확인 기록은 남기되, 실패해도 카드는 닫는다
-    if (risk?.riskEventId) acknowledgeRisk(risk.riskEventId).catch(() => undefined);
+    // 확인 기록은 남기되, 실패해도 카드는 닫는다. 서버 경고에는 이벤트 ID가 없어 회기로 찾는다
+    const recorded = risk?.riskEventId
+      ? acknowledgeRisk(risk.riskEventId)
+      : acknowledgeSessionRisks(sessionId);
+    recorded.catch(() => undefined);
     setRisk(null);
   }
 
-  const open = data?.status === 'CONFIRMED' || data?.status === 'IN_PROGRESS';
+  const open = data?.status === 'confirmed' || data?.status === 'in_progress';
 
   return (
     <main
@@ -146,7 +150,7 @@ export function RoomView({ role }: RoomViewProps) {
           <RiskCard
             event={risk}
             onPickScript={(text) => setPrefill((current) => ({ key: current.key + 1, text }))}
-            onCallOncall={() => oncall.mutate()}
+            onCallOncall={SERVER_HAS.oncall ? () => oncall.mutate() : undefined}
             onShareResources={() => share.mutate()}
             onAcknowledge={acknowledge}
             busy={oncall.isPending || share.isPending}

@@ -14,6 +14,7 @@ import { TextField } from '@/components/ui/TextField';
 import { errorCopy } from '@/copy/errorMessages';
 import { PROVIDER_ROOM } from '@/copy/room';
 import { formatKST } from '@/lib/date';
+import { SERVER_HAS } from '@/lib/serverFeatures';
 import { countChars } from '@/lib/text';
 import { showToast } from '@/stores/uiStore';
 
@@ -180,7 +181,9 @@ export function RoomPanel({ session, sessionId, trainee }: RoomPanelProps) {
     { value: 'summary', label: PROVIDER_ROOM.tabSummary },
     { value: 'note', label: PROVIDER_ROOM.tabNote },
     { value: 'history', label: PROVIDER_ROOM.tabHistory },
-    ...(trainee ? [{ value: 'referral' as const, label: PROVIDER_ROOM.tabReferral }] : []),
+    ...(trainee && SERVER_HAS.referralSuggestion
+      ? [{ value: 'referral' as const, label: PROVIDER_ROOM.tabReferral }]
+      : []),
   ];
 
   return (

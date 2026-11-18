@@ -170,7 +170,7 @@ export const workHandlers = [
     currentUser(request) ? HttpResponse.json(providerDb.supervisionRequests) : unauthenticated(),
   ),
 
-  http.post(url('/trainee/supervision-requests'), async ({ request }) => {
+  http.post(url('/supervision-requests'), async ({ request }) => {
     const me = currentUser(request);
     if (!me) return unauthenticated();
     const body = (await request.json()) as SupervisionRequestCreate;
@@ -227,7 +227,7 @@ export const workHandlers = [
       : unauthenticated(),
   ),
 
-  http.post(url('/expert/supervision-requests/:id/accept'), ({ request, params }) => {
+  http.post(url('/supervision-requests/:id/accept'), ({ request, params }) => {
     const me = currentUser(request);
     if (!me) return unauthenticated();
     const target = providerDb.supervisionRequests.find((item) => item.id === params.id);
@@ -296,11 +296,15 @@ export const workHandlers = [
       (item) => item.session_id === params.sessionId && item.provider_id === me.id,
     );
     if (!session) return notFound();
-    session.status = 'COMPLETED';
+    session.status = 'completed';
     return noContent();
   }),
 
-  http.post(url('/risk-events/:id/ack'), ({ request }) =>
+  http.get(url('/risk-events'), ({ request }) =>
+    currentUser(request) ? HttpResponse.json([]) : unauthenticated(),
+  ),
+
+  http.post(url('/risk-events/:id/acknowledge'), ({ request }) =>
     currentUser(request) ? noContent() : unauthenticated(),
   ),
 

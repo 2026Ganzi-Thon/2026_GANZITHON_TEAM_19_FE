@@ -41,7 +41,8 @@ export interface ClientReport {
   scope: 'session' | 'referral';
   status: ReportStatus;
   version: number;
-  client_summary?: ClientSummary | null;
+  /** 서버는 AI 요약(JSON)을 글자로 준다. 시드 데이터는 문장 하나다 (api/endpoints/reports.ts) */
+  client_summary?: ClientSummary | string | null;
   risk_level_label?: string | null;
   trainee_suggested_referral?: boolean;
   sources?: ReportSource[];
@@ -96,11 +97,10 @@ export interface Consent {
   session_dates?: string[];
 }
 
-/** CNS-02 POST /consents. 대상 전문가·리포트·버전은 서버가 연계에서 정한다 */
-export interface ConsentCreateRequest {
+/** CNS-02 POST /consents. 서버가 전문가·리포트·버전을 직접 받는다 */
+export type ConsentCreateRequest = Schema<'ConsentGrantRequest'> & {
   type: 'report_transfer' | 'transcript_transfer';
-  referral_id: string;
-}
+};
 
 export type ComplaintCategory =
   'late_noshow' | 'religion_moralizing' | 'private_contact' | 'insincere' | 'other';

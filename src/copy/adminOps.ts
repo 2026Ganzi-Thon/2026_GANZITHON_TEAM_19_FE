@@ -96,6 +96,14 @@ export const ADMIN_KPI = {
   to: '종료일',
   customInvalid: '시작일과 종료일을 골라 주세요',
   refreshNote: '60초마다 새로 불러와요',
+  /** 서버가 세는 이벤트 이름 (KPI-01) */
+  counts: {
+    signup_completed: '가입 완료',
+    intake_created: '고민 접수',
+    session_completed: '상담 완료',
+    referral_accepted: '전문 상담 연계 수락',
+    payment_succeeded: '결제 완료',
+  } as Record<string, string>,
   northStar: '첫 상담 경험자 수',
   northStarDefinition: '플랫폼에서 생애 첫 상담을 완료한 내담자 (가입 시 자기보고)',
   people: (count: number) => `${count.toLocaleString('ko-KR')}명`,

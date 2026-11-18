@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -27,7 +27,6 @@ const PAST_SESSIONS = '/c/sessions?tab=past';
 export function C11ReportPage() {
   const { reportId = '' } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const report = useQuery({
     queryKey: queryKeys.report(reportId),
     queryFn: () => getReport(reportId),
@@ -45,10 +44,13 @@ export function C11ReportPage() {
 
   const referral = useMutation({
     mutationFn: createReferral,
-    onSuccess: (detail) => {
-      queryClient.setQueryData(queryKeys.referral(detail.referral.id), detail);
+    onSuccess: (created) => {
+      if (!created.id) {
+        showToast(errorCopy('').message, 'error');
+        return;
+      }
       track('referral_started');
-      navigate(`/c/referrals/${detail.referral.id}`);
+      navigate(`/c/referrals/${created.id}`);
     },
     onError: (error) => {
       showToast(errorCopy(isApiError(error) ? error.code : '').message, 'error');

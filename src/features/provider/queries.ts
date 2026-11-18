@@ -12,6 +12,7 @@ import {
 } from '@/api/endpoints/supervisions';
 import { queryKeys } from '@/api/queryKeys';
 import { toKST } from '@/lib/date';
+import { SERVER_HAS } from '@/lib/serverFeatures';
 import { useAuthStore } from '@/stores/authStore';
 
 const STALE_MS = 30_000;
@@ -52,6 +53,7 @@ export function useTraineeSupervisions() {
   return useQuery({
     queryKey: ['supervisions', 'trainee'],
     queryFn: listTraineeSupervisions,
+    enabled: SERVER_HAS.supervisionFeedback,
     staleTime: STALE_MS,
   });
 }
@@ -60,18 +62,25 @@ export function useCompetency() {
   return useQuery({
     queryKey: ['competency'],
     queryFn: getCompetency,
+    enabled: SERVER_HAS.supervisionFeedback,
     staleTime: SLOW_STALE_MS,
   });
 }
 
 export function useMyStrikes() {
-  return useQuery({ queryKey: ['strikes', 'me'], queryFn: getMyStrikes, staleTime: SLOW_STALE_MS });
+  return useQuery({
+    queryKey: ['strikes', 'me'],
+    queryFn: getMyStrikes,
+    enabled: SERVER_HAS.strikes,
+    staleTime: SLOW_STALE_MS,
+  });
 }
 
 export function useExpertReferrals() {
   return useQuery({
     queryKey: ['expert-referrals'],
     queryFn: listExpertReferrals,
+    enabled: SERVER_HAS.expertInbox,
     staleTime: STALE_MS,
   });
 }
@@ -80,6 +89,7 @@ export function useExpertSupervisions() {
   return useQuery({
     queryKey: ['supervisions', 'expert'],
     queryFn: listExpertSupervisions,
+    enabled: SERVER_HAS.expertInbox,
     staleTime: STALE_MS,
   });
 }
@@ -88,7 +98,7 @@ export function useSupervisionRequests(enabled: boolean) {
   return useQuery({
     queryKey: ['supervision-requests', 'expert'],
     queryFn: listSupervisionRequests,
-    enabled,
+    enabled: enabled && SERVER_HAS.expertInbox,
     staleTime: STALE_MS,
   });
 }

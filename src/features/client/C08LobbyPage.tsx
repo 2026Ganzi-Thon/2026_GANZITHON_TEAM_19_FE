@@ -58,8 +58,8 @@ export function C08LobbyPage() {
   });
 
   useEffect(() => {
-    if (status === undefined || status === 'CONFIRMED' || status === 'IN_PROGRESS') return;
-    if (status === 'COMPLETED') {
+    if (status === undefined || status === 'confirmed' || status === 'in_progress') return;
+    if (status === 'completed') {
       navigate(`/c/sessions/${sessionId}/done`, { replace: true });
       return;
     }

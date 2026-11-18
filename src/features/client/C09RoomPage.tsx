@@ -31,8 +31,8 @@ export function C09RoomPage() {
   const donePath = `/c/sessions/${sessionId}/done`;
 
   useEffect(() => {
-    if (status === undefined || status === 'CONFIRMED' || status === 'IN_PROGRESS') return;
-    if (status === 'COMPLETED') {
+    if (status === undefined || status === 'confirmed' || status === 'in_progress') return;
+    if (status === 'completed') {
       navigate(donePath, { replace: true });
       return;
     }
@@ -41,7 +41,7 @@ export function C09RoomPage() {
   }, [status, donePath, navigate]);
 
   const data = session.data;
-  const open = status === 'CONFIRMED' || status === 'IN_PROGRESS';
+  const open = status === 'confirmed' || status === 'in_progress';
 
   return (
     // 키보드가 올라오면 보이는 영역 높이에 맞춰 입력창을 키보드 위에 둔다 (TRD 18-4)
