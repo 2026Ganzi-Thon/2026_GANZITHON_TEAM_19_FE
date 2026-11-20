@@ -25,7 +25,8 @@ const SETTLEMENT_KIND: Record<SettlementKind, string> = {
 };
 
 export const DASHBOARD = {
-  traineeTitle: (name: string) => `안녕하세요,\n${name}님`,
+  // 활동명이 '윤 선생님'처럼 이미 '님'으로 끝나면 한 번 더 붙이지 않는다
+  traineeTitle: (name: string) => `안녕하세요,\n${name.endsWith('님') ? name : `${name}님`}`,
   upcoming: '오늘·다가오는 세션',
   noUpcoming: '예정된 세션이 없어요',
   enter: '입장',
