@@ -138,6 +138,7 @@ export const LOBBY = {
   title: '곧 이야기가\n시작돼요.',
   untilStart: '시작까지',
   enterHint: '시작 10분 전부터 입장할 수 있어요.',
+  entryClosed: '상담 시간이 지나 입장할 수 없어요.',
   moodTitle: '지금 마음의 온도는?',
   etiquette: '연락처 교환과 녹취·캡처 공유는 할 수 없어요.\n불편하면 언제든 나갈 수 있어요.',
   enter: '상담방 입장',

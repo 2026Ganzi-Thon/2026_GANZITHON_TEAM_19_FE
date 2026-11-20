@@ -61,9 +61,14 @@ export function splitSessions(sessions: readonly Session[]): {
   };
 }
 
-export function canEnter(session: Session, now: number): boolean {
+/** 종료 5분이 지나 서버가 입장을 받지 않는다 */
+export function isEntryClosed(session: Session, now: number): boolean {
   const end = session.scheduled_end ? Date.parse(session.scheduled_end) : Infinity;
-  if (now > end + ENTER_AFTER_END_MINUTES * MINUTE_MS) return false;
+  return now > end + ENTER_AFTER_END_MINUTES * MINUTE_MS;
+}
+
+export function canEnter(session: Session, now: number): boolean {
+  if (isEntryClosed(session, now)) return false;
   if (session.status === 'in_progress') return true;
   if (session.status !== 'confirmed') return false;
   return startTime(session) - now <= ENTER_BEFORE_MINUTES * MINUTE_MS;

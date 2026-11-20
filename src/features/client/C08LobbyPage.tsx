@@ -23,7 +23,7 @@ import { useSessionFlowStore } from '@/stores/sessionFlowStore';
 import { showToast } from '@/stores/uiStore';
 
 import { useProviderName, useSession } from './queries';
-import { canEnter, trackLabel } from './sessions';
+import { canEnter, isEntryClosed, trackLabel } from './sessions';
 
 const ENTER_CHECK_MS = 5000;
 const SEPARATOR = '  ·  ';
@@ -105,7 +105,9 @@ export function C08LobbyPage() {
                   <CountdownTimer until={data.scheduled_start} />
                 </p>
               )}
-              <p className="pt-2 text-caption text-fg-muted">{LOBBY.enterHint}</p>
+              <p className="pt-2 text-caption text-fg-muted">
+                {isEntryClosed(data, now) ? LOBBY.entryClosed : LOBBY.enterHint}
+              </p>
             </div>
             <Mascot pose="rest" />
           </section>
