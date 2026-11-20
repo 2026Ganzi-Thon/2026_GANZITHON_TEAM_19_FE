@@ -69,8 +69,10 @@ export function C09RoomPage() {
           endsAt={data.scheduled_end}
           onEnded={() => navigate(donePath, { replace: true })}
           onNoShow={() => setNoShow(true)}
-          onJoinError={() => {
-            showToast(ROOM.joinFailed, 'error');
+          onJoinError={(code) => {
+            // 서버가 알려 준 이유가 있으면 그것을 보여 준다
+            const reason = errorCopy(code);
+            showToast(reason === errorCopy('') ? ROOM.joinFailed : reason.message, 'error');
             navigate(`/c/sessions/${sessionId}/lobby`, { replace: true });
           }}
           actions={

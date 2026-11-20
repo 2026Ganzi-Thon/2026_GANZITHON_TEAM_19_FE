@@ -116,6 +116,19 @@ describe('canEnter', () => {
     ).toBe(true);
   });
 
+  it('closes five minutes after the end, as the server refuses to join then', () => {
+    const times = {
+      scheduled_start: '2026-11-03T10:00:00Z',
+      scheduled_end: '2026-11-03T10:30:00Z',
+    };
+
+    expect(canEnter(session(times), Date.parse('2026-11-03T10:35:00Z'))).toBe(true);
+    expect(canEnter(session(times), Date.parse('2026-11-03T10:36:00Z'))).toBe(false);
+    expect(
+      canEnter(session({ ...times, status: 'in_progress' }), Date.parse('2026-11-03T10:36:00Z')),
+    ).toBe(false);
+  });
+
   it('keeps unpaid and finished sessions closed even at the start time', () => {
     const atStart = Date.parse('2026-11-03T10:00:00Z');
 

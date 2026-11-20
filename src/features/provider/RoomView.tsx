@@ -168,8 +168,10 @@ export function RoomView({ role }: RoomViewProps) {
           prefill={prefill}
           contactWarning={PROVIDER_ROOM.contactWarning}
           onEnded={() => navigate(listPath, { replace: true })}
-          onJoinError={() => {
-            showToast(ROOM.joinFailed, 'error');
+          onJoinError={(code) => {
+            // 서버가 알려 준 이유가 있으면 그것을 보여 준다
+            const reason = errorCopy(code);
+            showToast(reason === errorCopy('') ? ROOM.joinFailed : reason.message, 'error');
             navigate(listPath, { replace: true });
           }}
         />

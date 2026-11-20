@@ -3,6 +3,8 @@ import { SERVICE } from '@/copy/fixed';
 
 /** 입장 버튼이 열리는 시점: 시작 10분 전 (TRD C-01, C-08) */
 export const ENTER_BEFORE_MINUTES = 10;
+/** 서버는 종료 5분 뒤부터 입장을 거절한다 (RealtimeService JOIN_AFTER_END) */
+const ENTER_AFTER_END_MINUTES = 5;
 /** 이 시간 전에 취소해야 전액 환불된다 (TRD C-06, 운영 설정값) */
 export const REFUND_BEFORE_HOURS = 24;
 const RECENT_COUNT = 3;
@@ -60,6 +62,8 @@ export function splitSessions(sessions: readonly Session[]): {
 }
 
 export function canEnter(session: Session, now: number): boolean {
+  const end = session.scheduled_end ? Date.parse(session.scheduled_end) : Infinity;
+  if (now > end + ENTER_AFTER_END_MINUTES * MINUTE_MS) return false;
   if (session.status === 'in_progress') return true;
   if (session.status !== 'confirmed') return false;
   return startTime(session) - now <= ENTER_BEFORE_MINUTES * MINUTE_MS;
