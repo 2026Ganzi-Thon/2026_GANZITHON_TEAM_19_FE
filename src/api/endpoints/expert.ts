@@ -25,7 +25,22 @@ export async function respondReferral(
 /** RPT-02. 유효한 전달 동의가 없으면 403 (NO_CONSENT, CONSENT_REVOKED) */
 export async function getExpertReport(reportId: string): Promise<ExpertReport> {
   const { data } = await api.get<ExpertReport>(`/expert/reports/${reportId}`);
-  return data;
+  const content = data.content;
+  // 서버 content 는 AI 결과를 그대로 담은 자유 형식이라 빠진 목록·항목이 있어도 화면이 깨지지 않게 채운다
+  return content
+    ? {
+        ...data,
+        content: {
+          ...content,
+          timeline: content.timeline ?? [],
+          distortions: content.distortions ?? [],
+          triggers: content.triggers ?? [],
+          defenses: content.defenses ?? [],
+          focus_suggestions: content.focus_suggestions ?? [],
+          red_flag: { ...content.red_flag, history: content.red_flag?.history ?? [] },
+        },
+      }
+    : data;
 }
 
 /** SES-09. 같은 내담자와 내가 진행한 이전 회기 */

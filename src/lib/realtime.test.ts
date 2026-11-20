@@ -139,6 +139,16 @@ describe('realtime', () => {
     expect(wire.track).toHaveBeenCalledWith('realtime_reconnect');
   });
 
+  it('tries the join again when the server does not answer in time', async () => {
+    const { joinRoom } = await connect();
+    vi.useFakeTimers();
+    joinRoom('s1', () => undefined, vi.fn());
+
+    await vi.advanceTimersByTimeAsync(5000 + 2000);
+
+    expect(wire.sent.filter((frame) => frame.event === 'session.join')).toHaveLength(2);
+  });
+
   it('stops rejoining a room after leaving it', async () => {
     const { joinRoom, leaveRoom } = await connect();
     joinRoom('s1', () => undefined, vi.fn());

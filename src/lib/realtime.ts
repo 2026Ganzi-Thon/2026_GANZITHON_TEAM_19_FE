@@ -93,6 +93,7 @@ export interface RealtimeTransport {
 export const REALTIME_TIMEOUT = 'TIMEOUT';
 export const REALTIME_OFFLINE = 'NETWORK_ERROR';
 const ACK_TIMEOUT_MS = 5000;
+const JOIN_RETRY_MS = 2000;
 const UNKNOWN_FAILURE = 'INTERNAL';
 
 export class RealtimeError extends Error {
@@ -288,6 +289,12 @@ async function sendJoin(sessionId: string): Promise<void> {
   } catch (error) {
     const code = error instanceof RealtimeError ? error.code : UNKNOWN_FAILURE;
     rooms.get(sessionId)?.onJoin({ ok: false, code });
+    // 연결은 살아 있는데 응답만 늦었으면 재연결을 기다리지 않고 다시 들어간다
+    if (code === REALTIME_TIMEOUT) {
+      window.setTimeout(() => {
+        if (connected && rooms.has(sessionId)) void sendJoin(sessionId);
+      }, JOIN_RETRY_MS);
+    }
   }
 }
 

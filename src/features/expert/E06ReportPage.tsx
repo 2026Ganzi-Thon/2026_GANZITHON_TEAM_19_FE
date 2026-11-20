@@ -181,6 +181,9 @@ export function E06ReportPage() {
           <Skeleton lines={6} />
         </div>
       )}
+      {report.data?.status === 'failed' && (
+        <ErrorState title={COMMON.serverErrorTitle} onRetry={() => void report.refetch()} />
+      )}
       {report.data?.status === 'ready' && (
         <div className="select-none pb-10 pt-2">
           <ReportBody report={report.data} />

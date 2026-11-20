@@ -13,7 +13,14 @@ export async function createReferral(sourceSessionId: string): Promise<Schema<'R
 /** REF-02 */
 export async function getReferral(referralId: string): Promise<ReferralDetail> {
   const { data } = await api.get<ReferralDetail>(`/referrals/${referralId}`);
-  return data;
+  // 서버 스키마에서는 모두 선택 값이라 빠져 와도 화면이 깨지지 않게 채운다
+  return {
+    ...data,
+    candidates: data.candidates ?? [],
+    eligible_sessions: data.eligible_sessions ?? [],
+    included_session_ids: data.included_session_ids ?? [],
+    report: data.report ?? null,
+  };
 }
 
 /** REF-03 */

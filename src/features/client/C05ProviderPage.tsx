@@ -14,9 +14,11 @@ import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Chip } from '@/components/ui/Chip';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { MATCHES, PROVIDER } from '@/copy/client';
 import { errorCopy } from '@/copy/errorMessages';
+import { COMMON } from '@/copy/fixed';
 import { cx } from '@/lib/cx';
 import { formatKSTShortDate, formatKSTTime, kstDateKey, kstToUtcIso } from '@/lib/date';
 import { useSessionFlowStore } from '@/stores/sessionFlowStore';
@@ -182,6 +184,8 @@ export function C05ProviderPage() {
       <h2 className="pt-4 text-heading font-bold text-fg">{PROVIDER.dateTitle}</h2>
       {slots.isPending ? (
         <Skeleton lines={3} className="pt-4" />
+      ) : slots.isError ? (
+        <ErrorState title={COMMON.serverErrorTitle} onRetry={() => void slots.refetch()} />
       ) : firstOpenDate === undefined ? (
         <p className="pt-4 text-body-sm text-fg-muted">{PROVIDER.noSlots}</p>
       ) : (
