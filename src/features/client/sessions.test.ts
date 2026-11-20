@@ -68,33 +68,63 @@ describe('pickRecent', () => {
 
 describe('splitSessions', () => {
   it('puts unpaid, confirmed and running sessions under upcoming, nearest first', () => {
-    const { upcoming, past } = splitSessions([
-      session({ session_id: 'confirmed', scheduled_start: '2026-11-05T10:00:00Z' }),
-      session({ session_id: 'unpaid', status: 'pending_payment' }),
-      session({
-        session_id: 'running',
-        status: 'in_progress',
-        scheduled_start: '2026-11-03T08:50:00Z',
-      }),
-      session({ session_id: 'done', status: 'completed' }),
-    ]);
+    const { upcoming, past } = splitSessions(
+      [
+        session({ session_id: 'confirmed', scheduled_start: '2026-11-05T10:00:00Z' }),
+        session({ session_id: 'unpaid', status: 'pending_payment' }),
+        session({
+          session_id: 'running',
+          status: 'in_progress',
+          scheduled_start: '2026-11-03T08:50:00Z',
+        }),
+        session({ session_id: 'done', status: 'completed' }),
+      ],
+      NOW,
+    );
 
     expect(upcoming.map((item) => item.session_id)).toEqual(['running', 'unpaid', 'confirmed']);
     expect(past.map((item) => item.session_id)).toEqual(['done']);
   });
 
   it('lists finished, cancelled and missed sessions under past, newest first', () => {
-    const { past } = splitSessions([
-      session({ session_id: 'old', status: 'completed', scheduled_start: '2026-10-01T10:00:00Z' }),
-      session({ session_id: 'missed', status: 'no_show', scheduled_start: '2026-10-20T10:00:00Z' }),
-      session({
-        session_id: 'cancelled',
-        status: 'cancelled',
-        scheduled_start: '2026-10-10T10:00:00Z',
-      }),
-    ]);
+    const { past } = splitSessions(
+      [
+        session({
+          session_id: 'old',
+          status: 'completed',
+          scheduled_start: '2026-10-01T10:00:00Z',
+        }),
+        session({
+          session_id: 'missed',
+          status: 'no_show',
+          scheduled_start: '2026-10-20T10:00:00Z',
+        }),
+        session({
+          session_id: 'cancelled',
+          status: 'cancelled',
+          scheduled_start: '2026-10-10T10:00:00Z',
+        }),
+      ],
+      NOW,
+    );
 
     expect(past.map((item) => item.session_id)).toEqual(['missed', 'cancelled', 'old']);
+  });
+
+  it('moves a confirmed session to past once its entry window has closed', () => {
+    const { upcoming, past } = splitSessions(
+      [
+        session({
+          session_id: 'over',
+          scheduled_start: '2026-11-03T07:00:00Z',
+          scheduled_end: '2026-11-03T07:30:00Z',
+        }),
+      ],
+      NOW,
+    );
+
+    expect(upcoming).toEqual([]);
+    expect(past.map((item) => item.session_id)).toEqual(['over']);
   });
 });
 

@@ -32,6 +32,7 @@ import {
   canEnter,
   isCoaching,
   isComplaintOpen,
+  isEntryClosed,
   isRefundable,
   pickUpcoming,
   splitSessions,
@@ -53,6 +54,8 @@ function SessionItem({ session, now, onCancel }: SessionItemProps) {
   const providerName = useProviderName(session.provider_id);
   const complaintsEnabled = useFeatureFlag('p1_complaints');
   const { status, session_id: sessionId } = session;
+  // 입장 시간이 지난 회기는 들어가거나 취소할 수 없다
+  const open = !isEntryClosed(session, now);
   const facts = [
     session.scheduled_start && formatKST(session.scheduled_start),
     status && SESSION_STATUS_LABEL[status],
@@ -70,12 +73,12 @@ function SessionItem({ session, now, onCancel }: SessionItemProps) {
             {SESSIONS.pay}
           </Link>
         )}
-        {(status === 'confirmed' || status === 'in_progress') && (
+        {open && (status === 'confirmed' || status === 'in_progress') && (
           <Link to={`/c/sessions/${sessionId}/lobby`} className={ACTION}>
             {SESSIONS.enter}
           </Link>
         )}
-        {(status === 'confirmed' || status === 'pending_payment') && (
+        {open && (status === 'confirmed' || status === 'pending_payment') && (
           <button type="button" onClick={() => onCancel(session)} className={ACTION}>
             {SESSIONS.cancel}
           </button>
@@ -128,7 +131,7 @@ export function C07SessionsPage() {
     },
   });
 
-  const { upcoming, past } = splitSessions(sessions.data ?? []);
+  const { upcoming, past } = splitSessions(sessions.data ?? [], now);
   const list = tab === 'upcoming' ? upcoming : past;
   const next = pickUpcoming(sessions.data ?? [], now);
   const paidTarget = target?.status === 'confirmed';

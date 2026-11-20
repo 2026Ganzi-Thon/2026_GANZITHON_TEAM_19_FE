@@ -47,12 +47,17 @@ export function pickRecent(sessions: readonly Session[]): Session[] {
     .slice(0, RECENT_COUNT);
 }
 
-/** C-07 탭: 예정(결제 대기·확정·진행 중)은 가까운 순, 지난 상담은 최근 순 */
-export function splitSessions(sessions: readonly Session[]): {
+/** C-07 탭: 예정(결제 대기·확정·진행 중)은 가까운 순, 지난 상담은 최근 순.
+ * 서버가 아직 상태를 바꾸지 않았어도 입장 시간이 지난 회기는 지난 상담으로 본다 */
+export function splitSessions(
+  sessions: readonly Session[],
+  now: number,
+): {
   upcoming: Session[];
   past: Session[];
 } {
-  const isUpcoming = (session: Session) => UPCOMING_STATUSES.includes(session.status);
+  const isUpcoming = (session: Session) =>
+    UPCOMING_STATUSES.includes(session.status) && !isEntryClosed(session, now);
   return {
     upcoming: sessions.filter(isUpcoming).sort((a, b) => startTime(a) - startTime(b)),
     past: sessions

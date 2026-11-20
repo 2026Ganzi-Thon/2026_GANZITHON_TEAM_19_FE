@@ -19,7 +19,7 @@ export function T05SessionsPage() {
   const done = searchParams.get(TAB_PARAM) === 'done';
   const now = useNow();
   const sessions = useProviderSessions();
-  const { upcoming, past } = splitSessions(sessions.data ?? []);
+  const { upcoming, past } = splitSessions(sessions.data ?? [], now);
   const list = done ? past : upcoming;
 
   return (
