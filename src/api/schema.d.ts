@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/referrals/{referralId}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 연계 리포트에 포함할 회기 선택 */
+        put: operations["REF-03"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/referrals/{referralId}/expert": {
         parameters: {
             query?: never;
@@ -47,6 +64,23 @@ export interface paths {
         get?: never;
         /** 내 상담사 프로필 작성·수정 (심사 중에도 가능) */
         put: operations["USR-06"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expert/supervisions/{supervisionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 슈퍼비전 임시 저장·제출 */
+        put: operations["SUP-06"];
         post?: never;
         delete?: never;
         options?: never;
@@ -509,6 +543,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/expert/referrals/{referralId}/respond": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 전문가 연계 수락·거절 */
+        post: operations["REF-05"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/consents": {
         parameters: {
             query?: never;
@@ -680,6 +731,40 @@ export interface paths {
         patch: operations["ADM-05_1"];
         trace?: never;
     };
+    "/trainee/supervisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 수련생이 받은 슈퍼비전 목록 */
+        get: operations["SUP-07"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/trainee/supervisions/{supervisionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 수련생 슈퍼비전 상세 (읽음 처리) */
+        get: operations["SUP-08"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/supervisions": {
         parameters: {
             query?: never;
@@ -738,6 +823,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/referrals/{referralId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 연계 상세 (포함 가능 회기·포함 회기·전문가 후보·연계 리포트) */
+        get: operations["REF-02"];
         put?: never;
         post?: never;
         delete?: never;
@@ -932,6 +1034,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/expert/supervisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 전문가 슈퍼비전 목록 */
+        get: operations["SUP-04"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expert/supervisions/{supervisionId}/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 슈퍼비전 작성 화면 데이터 (수련생 회기·대화록·연계 리포트·저장본) */
+        get: operations["SUP-05"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/expert/reports/{reportId}": {
         parameters: {
             query?: never;
@@ -940,6 +1076,23 @@ export interface paths {
             cookie?: never;
         };
         get: operations["RPT-02"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/expert/referrals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 전문가 연계 요청 목록 */
+        get: operations["REF-04"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1090,6 +1243,56 @@ export interface components {
         SessionNoteRequest: {
             note: string;
         };
+        ReferralSessionsRequest: {
+            session_ids: string[];
+        };
+        Candidate: {
+            /** Format: uuid */
+            provider_id?: string;
+            display_name?: string;
+            track?: string;
+            /** Format: date-time */
+            earliest_slot?: string;
+            /** Format: int32 */
+            price?: number;
+        };
+        EligibleSession: {
+            /** Format: uuid */
+            session_id?: string;
+            /** Format: int32 */
+            session_no?: number;
+            /** Format: date-time */
+            date?: string;
+            provider_display?: string;
+            report_status?: string;
+        };
+        Referral: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            source_session_id?: string;
+            /** Format: uuid */
+            expert_id?: string;
+            status?: string;
+            /** Format: date-time */
+            included_locked_at?: string;
+            /** Format: date-time */
+            created_at?: string;
+        };
+        ReferralDetailResponse: {
+            referral?: components["schemas"]["Referral"];
+            eligible_sessions?: components["schemas"]["EligibleSession"][];
+            included_session_ids?: string[];
+            candidates?: components["schemas"]["Candidate"][];
+            report?: components["schemas"]["ReportRef"];
+        };
+        ReportRef: {
+            /** Format: uuid */
+            id?: string;
+            status?: string;
+            /** Format: int32 */
+            version?: number;
+        };
         ReferralExpertRequest: {
             /** Format: uuid */
             expert_id: string;
@@ -1139,6 +1342,32 @@ export interface components {
             career?: components["schemas"]["Career"][];
             school?: string;
             accepts_supervision?: boolean;
+        };
+        Alternative: {
+            /** Format: uuid */
+            session_id?: string;
+            quote?: string;
+            suggestion?: string;
+        };
+        Scores: {
+            /** Format: int32 */
+            rapport?: number;
+            /** Format: int32 */
+            empathy?: number;
+            /** Format: int32 */
+            risk?: number;
+            /** Format: int32 */
+            structure?: number;
+        };
+        SupervisionWriteRequest: {
+            draft: boolean;
+            well_done?: string;
+            blind_spot?: string;
+            alternative_responses?: components["schemas"]["Alternative"][];
+            risk_rating?: string;
+            risk_comment?: string;
+            next_action?: string;
+            scores?: components["schemas"]["Scores"];
         };
         JsonNode: {
             /** @enum {string} */
@@ -1418,6 +1647,10 @@ export interface components {
         IdentityVerifyResponse: {
             verified?: boolean;
         };
+        ExpertReferralRespondRequest: {
+            action: string;
+            reason?: string;
+        };
         ConsentGrantRequest: {
             type: string;
             version: string;
@@ -1572,6 +1805,7 @@ export interface components {
             scheduled_end?: string;
             /** Format: int32 */
             rating?: number;
+            report?: components["schemas"]["ReportRef"];
         };
         SessionHistoryItem: {
             /** Format: uuid */
@@ -1709,6 +1943,16 @@ export interface components {
             risk_level?: string;
             /** Format: date-time */
             ready_at?: string;
+            sources?: components["schemas"]["Source"][];
+        };
+        Source: {
+            /** Format: uuid */
+            session_id?: string;
+            /** Format: int32 */
+            session_no?: number;
+            /** Format: date-time */
+            date?: string;
+            provider_display?: string;
         };
         IntakeListItemResponse: {
             /** Format: uuid */
@@ -1724,6 +1968,50 @@ export interface components {
             status?: string;
             db?: string;
             redis?: string;
+        };
+        ExpertReportResponse: {
+            /** Format: uuid */
+            id?: string;
+            scope?: string;
+            status?: string;
+            /** Format: int32 */
+            version?: number;
+            content?: {
+                [key: string]: Record<string, never>;
+            };
+            client_summary?: {
+                [key: string]: Record<string, never>;
+            };
+            risk_level?: string;
+            /** Format: date-time */
+            ready_at?: string;
+            sources?: components["schemas"]["Source"][];
+            sources_meta?: components["schemas"]["SourceMeta"][];
+        };
+        SourceMeta: {
+            /** Format: int32 */
+            session_no?: number;
+            /** Format: int32 */
+            duration_min?: number;
+        };
+        ExpertReferralItem: {
+            /** Format: uuid */
+            id?: string;
+            status?: string;
+            client_nickname?: string;
+            category?: string;
+            /** Format: date-time */
+            scheduled_start?: string;
+            risk_level?: string;
+            /** Format: int32 */
+            included_session_count?: number;
+            trainee_reason?: string;
+            /** Format: date-time */
+            respond_by?: string;
+            has_report_consent?: boolean;
+            /** Format: uuid */
+            report_id?: string;
+            report_ready?: boolean;
         };
         PageResponseAdminUserRow: {
             items?: components["schemas"]["AdminUserRow"][];
@@ -1844,6 +2132,32 @@ export interface operations {
             };
         };
     };
+    "REF-03": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referralId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferralSessionsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReferralDetailResponse"];
+                };
+            };
+        };
+    };
     expert: {
         parameters: {
             query?: never;
@@ -1891,6 +2205,30 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["ProviderProfileResponse"];
                 };
+            };
+        };
+    };
+    "SUP-06": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supervisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupervisionWriteRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2655,6 +2993,30 @@ export interface operations {
             };
         };
     };
+    "REF-05": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referralId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpertReferralRespondRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "CNS-02": {
         parameters: {
             query?: never;
@@ -2935,6 +3297,52 @@ export interface operations {
             };
         };
     };
+    "SUP-07": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    "SUP-08": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supervisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     list_1: {
         parameters: {
             query?: never;
@@ -3015,6 +3423,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RiskEventResponse"][];
+                };
+            };
+        };
+    };
+    "REF-02": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                referralId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReferralDetailResponse"];
                 };
             };
         };
@@ -3256,6 +3686,52 @@ export interface operations {
             };
         };
     };
+    "SUP-04": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+        };
+    };
+    "SUP-05": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                supervisionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "RPT-02": {
         parameters: {
             query?: never;
@@ -3273,7 +3749,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ReportResponse"];
+                    "*/*": components["schemas"]["ExpertReportResponse"];
+                };
+            };
+        };
+    };
+    "REF-04": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExpertReferralItem"][];
                 };
             };
         };

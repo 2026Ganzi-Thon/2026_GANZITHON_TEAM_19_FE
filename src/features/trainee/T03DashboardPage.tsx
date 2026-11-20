@@ -64,7 +64,7 @@ export function T03DashboardPage() {
         </Section>
       )}
 
-      {SERVER_HAS.supervisionFeedback && (
+      {SERVER_HAS.competency && (
         <Section title={DASHBOARD.totals}>
           {totals && (
             <p className="pt-3 text-body font-medium text-fg">

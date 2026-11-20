@@ -1,10 +1,12 @@
-// shortcut: 배포된 서버에 API가 없는 기능은 입구를 숨기고 호출도 하지 않는다 (2026-11-18 기준).
+// shortcut: 배포된 서버에 API가 없는 기능은 입구를 숨기고 호출도 하지 않는다 (2026-11-20 기준).
 // 백엔드가 API를 만들면 해당 값을 true 로 바꾸고 화면을 서버 모양에 맞춘다
 export const SERVER_HAS = {
-  /** 수련생 피드백 목록·내용과 역량 (SUP-04~06) */
-  supervisionFeedback: false,
+  /** 수련생 피드백 목록·내용 (SUP-07·08, 2026-11-20 서버 배포) */
+  supervisionFeedback: true,
+  /** 수련생 역량 (SUP-06) */
+  competency: false,
   /** 전문가 연계 요청함과 슈퍼비전 목록·작성 (REF-05·06, SUP-01~03) */
-  expertInbox: false,
+  expertInbox: true,
   /** 내 스트라이크 (CMP-05) */
   strikes: false,
   /** 위기 때 당직 호출 (RSK-04) */

@@ -42,7 +42,7 @@ function ReportBody({ report }: { report: ExpertReport }) {
       <Block title={EXPERT_REPORT.timeline}>
         <ol className="flex flex-col gap-3 pt-2">
           {content.timeline.map((item) => {
-            const meta = report.sources_meta.find(
+            const meta = report.sources_meta?.find(
               (source) => source.session_no === item.session_no,
             );
             return (
@@ -118,17 +118,19 @@ function ReportBody({ report }: { report: ExpertReport }) {
         </ol>
       </Block>
 
-      <Block title={EXPERT_REPORT.consent}>
-        <p className="pt-1 text-fg-muted">
-          {EXPERT_REPORT.consentLine(
-            formatKST(report.consent.granted_at),
-            report.consent.report_version,
-          )}
-        </p>
-        <p className="text-fg-muted">
-          {report.consent.scopes.map((scope) => SCOPE_LABEL[scope] ?? scope).join(' · ')}
-        </p>
-      </Block>
+      {report.consent && (
+        <Block title={EXPERT_REPORT.consent}>
+          <p className="pt-1 text-fg-muted">
+            {EXPERT_REPORT.consentLine(
+              formatKST(report.consent.granted_at),
+              report.consent.report_version,
+            )}
+          </p>
+          <p className="text-fg-muted">
+            {report.consent.scopes.map((scope) => SCOPE_LABEL[scope] ?? scope).join(' · ')}
+          </p>
+        </Block>
+      )}
     </>
   );
 }

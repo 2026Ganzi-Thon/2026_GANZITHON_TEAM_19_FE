@@ -62,7 +62,7 @@ export function useCompetency() {
   return useQuery({
     queryKey: ['competency'],
     queryFn: getCompetency,
-    enabled: SERVER_HAS.supervisionFeedback,
+    enabled: SERVER_HAS.competency,
     staleTime: SLOW_STALE_MS,
   });
 }

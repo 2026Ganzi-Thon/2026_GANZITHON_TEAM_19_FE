@@ -177,7 +177,7 @@ export interface ExpertReportContent {
 export interface ExpertReport {
   status: ReportStatus;
   content: ExpertReportContent | null;
-  sources_meta: Array<{
+  sources_meta?: Array<{
     session_no: number;
     date: string;
     duration_min: number;
@@ -185,7 +185,8 @@ export interface ExpertReport {
     mood_after?: number | null;
     trainee_label: string;
   }>;
-  consent: { granted_at: string; report_version: number; scopes: string[] };
+  /** 서버가 아직 주지 않는다 (2026-11-20) */
+  consent?: { granted_at: string; report_version: number; scopes: string[] };
 }
 
 /** SUP-02 GET /expert/supervisions/{id}/context */
