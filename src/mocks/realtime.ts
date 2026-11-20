@@ -197,13 +197,8 @@ export function createMockTransport(handlers: TransportHandlers): RealtimeTransp
       if (risky) {
         later(
           () =>
-            emit('risk:alert', {
-              session_id: sessionId,
-              risk_event_id: 'risk-mock-1',
-              level: 'high',
-              evidence: RISKY_CLIENT_LINE,
-              script: ['지금 안전한 곳에 계신가요?', '자신을 해칠 생각이 드시나요?'],
-            }),
+            // 실서버처럼 회기와 단계만 보낸다 (이벤트 ID·근거·대응 문장 없음)
+            emit('risk:alert', { session_id: sessionId, level: 'high' }),
           TYPING_MS + REPLY_DELAY_MS,
         );
       }
